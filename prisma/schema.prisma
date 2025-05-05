@@ -11,10 +11,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// https://dbdiagram.io/d/finoliers-681790d11ca52373f56487b3
+
 model Finoliers {
   id          String   @id
   displayName String
   avatar      String
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
+  votes       Votes[]
+  tags        Tags[]
+}
+
+model Votes {
+  id         String    @id @default(cuid())
+  finolier   Finoliers @relation(fields: [finolierId], references: [id])
+  finolierId String
+  createdAt  DateTime  @default(now())
+  vote       Boolean   @default(false)
+  user       Users     @relation(fields: [userId], references: [id])
+  userId     String
+}
+
+model Users {
+  id    String  @id @default(cuid())
+  votes Votes[]
+  tags  Tags[]
+}
+
+model Tags {
+  id         String    @id @default(cuid())
+  name       String
+  finolier   Finoliers @relation(fields: [finolierId], references: [id])
+  user       Users     @relation(fields: [userId], references: [id])
+  finolierId String
+  userId     String
+  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime  @default(now())
+
+  @@index([finolierId])
+  @@index([userId])
 }
