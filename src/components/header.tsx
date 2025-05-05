@@ -1,6 +1,28 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
+function generateUserId() {
+  return `user_${Math.random().toString(36).substr(2, 9)}`;
+}
+
 export default function Header() {
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      let storedUserId = window.localStorage.getItem("userId");
+      if (!storedUserId) {
+        storedUserId = generateUserId();
+        window.localStorage.setItem("userId", storedUserId);
+      }
+      setUserId(storedUserId);
+    }
+  }, []);
+
+  console.log("User ID:", userId);
+
   return (
     <header className="bg-slate-800 text-white p-4 flex items-center justify-between">
       <h1 className="text-3xl font-bold font-mono tracking-wider uppercase">
