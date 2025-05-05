@@ -1,7 +1,7 @@
 import prisma from "@/db";
 
 export default async function Home() {
-  const finoliers = await prisma.user.findMany();
+  const finoliers = await prisma.finoliers.findMany();
   console.log(finoliers);
 
   return (
