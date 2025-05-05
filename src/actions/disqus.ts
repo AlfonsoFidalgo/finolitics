@@ -18,7 +18,6 @@ export interface Finolier {
 }
 
 interface FinolierFormState {
-  errors: Record<string, string>;
   success: boolean;
   message: string;
   finolier: Finolier;
@@ -35,23 +34,46 @@ export async function fetchFinolierDetails(
     },
   });
   if (!res.ok) {
-    throw new Error("Failed to fetch data");
+    return {
+      success: false,
+      message: "Finolier no encontrado",
+      finolier: {} as Finolier,
+    };
   }
   const data = await res.json();
-  
+  const finolierData = {
+    id,
+    displayName: data.response.name,
+    avatar: data.response.avatar?.permalink,
+    about: data.response.about,
+    location: data.response.location,
+    numFollowers: data.response.numFollowers,
+    numFollowing: data.response.numFollowing,
+    numPosts: data.response.numPosts,
+  };
+
+  // check if finolier already exists in the database
+  const existingFinolier = await prisma.finoliers.findUnique({
+    where: { id: finolierData.id },
+  });
+
+  if (existingFinolier) {
+    await prisma.finoliers.update({
+      where: { id: finolierData.id },
+      data: { ...finolierData },
+    });
+    return {
+      success: true,
+      message: "Finolier details updated successfully",
+      finolier: finolierData,
+    };
+  }
+
+  await prisma.finoliers.create({ data: { ...finolierData } });
+
   return {
-    errors: {},
     success: true,
     message: "Finolier details fetched successfully",
-    finolier: {
-      id,
-      displayName: data.response.name,
-      avatar: data.response.avatar?.permalink,
-      about: data.response.about,
-      location: data.response.location,
-      numFollowers: data.response.numFollowers,
-      numFollowing: data.response.numFollowing,
-      numPosts: data.response.numPosts,
-    },
+    finolier: finolierData,
   };
 }

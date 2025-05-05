@@ -8,8 +8,10 @@ export default function Home() {
 
   const [formState, action, isPending] = useActionState(
     fetchFinolierDetails.bind(null, finolier),
-    { errors: {}, success: true, message: "", finolier: {} as Finolier }
+    { success: true, message: "", finolier: {} as Finolier }
   );
+
+  console.log(formState);
 
   return (
     <div>
