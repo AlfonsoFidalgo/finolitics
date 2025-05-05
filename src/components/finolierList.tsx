@@ -1,5 +1,5 @@
-
-import {  type Finolier } from "@/actions/disqus";
+import { type Finolier } from "@/actions/disqus";
+import Link from "next/link";
 
 export default function FinolierList({ finoliers }: { finoliers: Finolier[] }) {
   return (
@@ -8,14 +8,12 @@ export default function FinolierList({ finoliers }: { finoliers: Finolier[] }) {
       <ul className="list-disc">
         {finoliers.map((finolier) => (
           <li key={finolier.id} className="mb-2 list-none">
-            <a
-              href={`https://disqus.com/${finolier.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href={`/${finolier.id}`}
               className="text-blue-500 hover:underline"
             >
               {finolier.displayName}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
