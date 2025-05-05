@@ -18,7 +18,7 @@ export interface Finolier {
 }
 
 interface FinolierFormState {
-  success: boolean;
+  success: boolean | null;
   message: string;
   finolier: Finolier;
 }
