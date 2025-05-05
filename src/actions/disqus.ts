@@ -23,6 +23,10 @@ interface FinolierFormState {
   finolier: Finolier;
 }
 
+export async function fetchFinoliers(): Promise<Finolier[]> {
+  return await prisma.finoliers.findMany();
+}
+
 export async function fetchFinolierDetails(
   id: string
 ): Promise<FinolierFormState> {
