@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useUserContext } from "@/contexts/userContext";
 import Link from "next/link";
 
 function generateUserId() {
@@ -8,9 +9,10 @@ function generateUserId() {
 }
 
 export default function Header() {
-  const [userId, setUserId] = useState<string | null>(null);
+  const { userId, setUserId } = useUserContext();
 
   useEffect(() => {
+    if (userId) return;
     if (typeof window !== "undefined" && window.localStorage) {
       let storedUserId = window.localStorage.getItem("userId");
       if (!storedUserId) {
@@ -19,9 +21,7 @@ export default function Header() {
       }
       setUserId(storedUserId);
     }
-  }, []);
-
-  console.log("User ID:", userId);
+  }, [setUserId, userId]);
 
   return (
     <header className="bg-slate-800 text-white p-4 flex items-center justify-between">
