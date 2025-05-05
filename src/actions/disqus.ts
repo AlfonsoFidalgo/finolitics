@@ -1,6 +1,6 @@
 "use server";
 
-// import prisma from "@/db";
+import prisma from "@/db";
 
 if (!process.env.DISQUS_API) {
   throw new Error("DISQUS_API_KEY is not defined");

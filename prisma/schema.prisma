@@ -14,13 +14,18 @@ datasource db {
 // https://dbdiagram.io/d/finoliers-681790d11ca52373f56487b3
 
 model Finoliers {
-  id          String   @id
-  displayName String
-  avatar      String
-  updatedAt   DateTime @updatedAt
-  createdAt   DateTime @default(now())
-  votes       Votes[]
-  tags        Tags[]
+  id           String   @id
+  displayName  String
+  avatar       String
+  about        String
+  location     String
+  numFollowers Int
+  numFollowing Int
+  numPosts     Int
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  votes        Votes[]
+  tags         Tags[]
 }
 
 model Votes {
