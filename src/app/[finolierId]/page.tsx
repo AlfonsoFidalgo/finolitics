@@ -1,4 +1,5 @@
 import Image from "next/image";
+import FinolierVote from "@/components/finolierVote";
 import { fetchFinolierDetails } from "@/actions/disqus";
 
 export default async function FinolierPage({
@@ -37,6 +38,7 @@ export default async function FinolierPage({
       <h2 className="text-xl mb-2">
         {finolier.numFollowers} seguidores, siguiendo a {finolier.numFollowing}
       </h2>
+      <FinolierVote />
     </div>
   );
 }
