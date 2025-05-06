@@ -47,9 +47,10 @@ model Votes {
 }
 
 model Users {
-  id    String  @id @default(cuid())
-  votes Votes[]
-  tags  Tags[]
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  votes     Votes[]
+  tags      Tags[]
 }
 
 model Tags {
