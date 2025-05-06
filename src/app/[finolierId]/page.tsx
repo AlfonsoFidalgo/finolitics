@@ -20,7 +20,7 @@ export default async function FinolierPage({
   }
   const { finolier } = finolierDetails;
   return (
-    <div className="flex flex-col items-center justify-center mt-4 bg-slate-50 p-8 w-11/12 mx-auto rounded-xl shadow-lg">
+    <div className="flex flex-col items-center justify-center mt-4 bg-slate-50 p-8 sm:w-11/12 md:w-3/4 mx-auto rounded-xl shadow-lg">
       <Image
         className="border-2 border-slate-700 rounded-full"
         src={finolier.avatar}
@@ -28,14 +28,18 @@ export default async function FinolierPage({
         height={100}
         alt="avatar"
       />
-      <h1 className="text-4xl mb-4 font-bold">{finolier.displayName}</h1>
+      <h1 className="text-4xl mb-4 font-bold text-center">
+        {finolier.displayName}
+      </h1>
       {finolier.about && finolier.location && (
-        <h2 className="text-2xl mb-4 italic">
+        <h2 className="text-2xl mb-4 italic text-center">
           {finolier.about}. {finolier.location}
         </h2>
       )}
-      <h2 className="text-xl mb-2">{finolier.numPosts} comentarios</h2>
-      <h2 className="text-xl mb-2">
+      <h2 className="text-xl mb-2 text-center">
+        {finolier.numPosts} comentarios
+      </h2>
+      <h2 className="text-xl mb-2 text-center">
         {finolier.numFollowers} seguidores, siguiendo a {finolier.numFollowing}
       </h2>
       <FinolierVote finolierId={finolierId} />
