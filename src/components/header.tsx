@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserContext } from "@/contexts/userContext";
 import Link from "next/link";
+import { useUserContext } from "@/contexts/userContext";
+import { saveUser } from "@/actions/utils";
 
 function generateUserId() {
   return `user_${Math.random().toString(36).substr(2, 9)}`;
@@ -13,14 +14,22 @@ export default function Header() {
 
   useEffect(() => {
     if (userId) return;
-    if (typeof window !== "undefined" && window.localStorage) {
-      let storedUserId = window.localStorage.getItem("userId");
-      if (!storedUserId) {
-        storedUserId = generateUserId();
-        window.localStorage.setItem("userId", storedUserId);
+    async function handleUserStorage() {
+      if (typeof window !== "undefined" && window.localStorage) {
+        let storedUserId = window.localStorage.getItem("userId");
+        if (!storedUserId) {
+          storedUserId = generateUserId();
+          window.localStorage.setItem("userId", storedUserId);
+          try {
+            await saveUser(storedUserId);
+          } catch (error) {
+            console.error("Failed to save user:", error);
+          }
+        }
+        setUserId(storedUserId);
       }
-      setUserId(storedUserId);
     }
+    handleUserStorage();
   }, [setUserId, userId]);
 
   return (
