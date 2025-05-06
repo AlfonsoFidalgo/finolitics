@@ -31,6 +31,26 @@ export async function emitVote(
   }
 }
 
+export async function fetchUserVote(
+  finolierId: string,
+  userId: string
+): Promise<"like" | "dislike" | "unknown" | undefined> {
+  try {
+    const vote = await prisma.votes.findUnique({
+      where: {
+        userId_finolierId: {
+          userId,
+          finolierId,
+        },
+      },
+    });
+    return vote?.vote;
+  } catch (error: unknown) {
+    console.error("Error fetching votes:", error);
+    return undefined;
+  }
+}
+
 export async function saveUser(userId: string): Promise<{
   success: boolean;
 }> {

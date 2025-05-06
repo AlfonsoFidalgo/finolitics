@@ -1,11 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useUserContext } from "@/contexts/userContext";
-import { emitVote } from "@/actions/utils";
+import { emitVote, fetchUserVote } from "@/actions/utils";
 
 export default function FinolierVote({ finolierId }: { finolierId: string }) {
   const { userId } = useUserContext();
-  console.log("userId", userId);
+  const [vote, setVote] = useState<"like" | "dislike" | "unknown" | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    async function fetchVote() {
+      if (!finolierId || !userId) return;
+      const userVote = await fetchUserVote(finolierId, userId);
+
+      setVote(userVote);
+    }
+    fetchVote();
+  }, [finolierId, userId, vote]);
 
   async function handleVote(vote: "like" | "dislike" | "unknown") {
     if (!userId) {
@@ -21,7 +34,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
       <button
         className={`bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600 ${
           !userId ? "opacity-50 cursor-not-allowed" : ""
-        }`}
+        } ${vote === "like" ? "underline font-bold" : ""}`}
         disabled={!userId}
         onClick={() => handleVote("like")}
       >
@@ -30,7 +43,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
       <button
         className={`bg-slate-500 text-white px-4 py-2 rounded shadow-md hover:bg-slate-600 ${
           !userId ? "opacity-50 cursor-not-allowed" : ""
-        }`}
+        } ${vote === "unknown" ? "underline font-bold" : ""}`}
         disabled={!userId}
         onClick={() => handleVote("unknown")}
       >
@@ -39,7 +52,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
       <button
         className={`bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 ${
           !userId ? "opacity-50 cursor-not-allowed" : ""
-        }`}
+        } ${vote === "dislike" ? "underline font-bold" : ""}`}
         disabled={!userId}
         onClick={() => handleVote("dislike")}
       >
