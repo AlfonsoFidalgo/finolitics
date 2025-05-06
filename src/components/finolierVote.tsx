@@ -3,13 +3,39 @@
 import { useEffect, useState } from "react";
 import { useUserContext } from "@/contexts/userContext";
 import Chart from "@/components/UI/pieChart";
-import { emitVote, fetchUserVote } from "@/actions/utils";
+import { emitVote, fetchUserVote, fetchFinolierVotes } from "@/actions/utils";
 
 export default function FinolierVote({ finolierId }: { finolierId: string }) {
   const { userId } = useUserContext();
   const [vote, setVote] = useState<"like" | "dislike" | "unknown" | undefined>(
     undefined
   );
+  const [summaryVotes, setSummaryVotes] = useState<{
+    like: number;
+    dislike: number;
+    unknown: number;
+  } | null>({
+    like: 0,
+    dislike: 0,
+    unknown: 0,
+  });
+
+  useEffect(() => {
+    async function fetchVotes() {
+      if (!finolierId) return;
+      const summary = await fetchFinolierVotes(finolierId);
+      if (!summary) {
+        setSummaryVotes({
+          like: 0,
+          dislike: 0,
+          unknown: 0,
+        });
+        return;
+      }
+      setSummaryVotes(summary);
+    }
+    fetchVotes();
+  }, [finolierId]);
 
   useEffect(() => {
     async function fetchVote() {
@@ -65,7 +91,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
           Me cae mal
         </button>
       </div>
-      <Chart />
+      {summaryVotes && <Chart votes={summaryVotes} />}
     </>
   );
 }

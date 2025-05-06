@@ -1,11 +1,5 @@
 import { PieChart, Pie, Cell } from "recharts";
 
-const data = [
-  { name: "like", value: 600 },
-  { name: "unknown", value: 500 },
-  { name: "dislike", value: 200 },
-];
-
 const COLORS = ["#00C950", "#61738E", "#FA2C37"];
 
 const RADIAN = Math.PI / 180;
@@ -41,7 +35,16 @@ const renderCustomizedLabel = ({
   );
 };
 
-export default function Chart() {
+export default function Chart({
+  votes,
+}: {
+  votes: { like: number; dislike: number; unknown: number };
+}) {
+  const data = [
+    { name: "like", value: votes.like },
+    { name: "unknown", value: votes.unknown },
+    { name: "dislike", value: votes.dislike },
+  ];
   return (
     <PieChart width={300} height={300}>
       <Pie
@@ -55,7 +58,7 @@ export default function Chart() {
         dataKey="value"
       >
         {data.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          <Cell key={`cell-${index}`} fill={COLORS[index]} />
         ))}
       </Pie>
     </PieChart>

@@ -72,6 +72,38 @@ export async function fetchUserVote(
   }
 }
 
+export async function fetchFinolierVotes(finolierId: string): Promise<{
+  like: number;
+  dislike: number;
+  unknown: number;
+} | null> {
+  try {
+    const votes = await prisma.votes.findMany({
+      where: {
+        finolierId,
+      },
+    });
+    const summaryVotes = {
+      like: 0,
+      dislike: 0,
+      unknown: 0,
+    };
+    votes.forEach((vote) => {
+      if (vote.vote === "like") {
+        summaryVotes.like++;
+      } else if (vote.vote === "dislike") {
+        summaryVotes.dislike++;
+      } else if (vote.vote === "unknown") {
+        summaryVotes.unknown++;
+      }
+    });
+    return summaryVotes;
+  } catch (error: unknown) {
+    console.error("Error fetching votes:", error);
+    return null;
+  }
+}
+
 export async function saveUser(userId: string): Promise<{
   success: boolean;
 }> {
