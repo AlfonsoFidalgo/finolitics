@@ -38,7 +38,7 @@ export default async function FinolierPage({
       <h2 className="text-xl mb-2">
         {finolier.numFollowers} seguidores, siguiendo a {finolier.numFollowing}
       </h2>
-      <FinolierVote />
+      <FinolierVote finolierId={finolierId} />
     </div>
   );
 }
