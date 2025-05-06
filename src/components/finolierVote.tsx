@@ -20,13 +20,17 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
     fetchVote();
   }, [finolierId, userId, vote]);
 
-  async function handleVote(vote: "like" | "dislike" | "unknown") {
+  async function handleVote(newVote: "like" | "dislike" | "unknown") {
     if (!userId) {
       console.error("No userId found");
       return;
     }
-    const result = await emitVote(userId, finolierId, vote);
-    console.log(result);
+    const result = await emitVote(userId, finolierId, newVote, vote);
+    if (result.success) {
+      setVote(newVote);
+    } else {
+      console.error(result.message);
+    }
   }
 
   return (
