@@ -14,11 +14,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
     like: number;
     dislike: number;
     unknown: number;
-  } | null>({
-    like: 0,
-    dislike: 0,
-    unknown: 0,
-  });
+  } | null>(null);
 
   useEffect(() => {
     async function fetchVotes() {
@@ -34,10 +30,6 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
       }
       setSummaryVotes(summary);
     }
-    fetchVotes();
-  }, [finolierId]);
-
-  useEffect(() => {
     async function fetchVote() {
       if (!finolierId || !userId) return;
       const userVote = await fetchUserVote(finolierId, userId);
@@ -45,6 +37,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
       setVote(userVote);
     }
     fetchVote();
+    fetchVotes();
   }, [finolierId, userId, vote]);
 
   async function handleVote(newVote: "like" | "dislike" | "unknown") {

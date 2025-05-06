@@ -20,7 +20,7 @@ export default async function FinolierPage({
   }
   const { finolier } = finolierDetails;
   return (
-    <div className="flex flex-col items-center justify-center mt-8">
+    <div className="flex flex-col items-center justify-center mt-4 bg-slate-50 p-8 w-11/12 mx-auto rounded-xl shadow-lg">
       <Image
         className="border-2 border-slate-700 rounded-full"
         src={finolier.avatar}
