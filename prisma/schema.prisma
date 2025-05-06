@@ -28,14 +28,22 @@ model Finoliers {
   tags         Tags[]
 }
 
+enum VoteType {
+  like
+  dislike
+  unknown
+}
+
 model Votes {
   id         String    @id @default(cuid())
   finolier   Finoliers @relation(fields: [finolierId], references: [id])
   finolierId String
   createdAt  DateTime  @default(now())
-  vote       Boolean   @default(false)
+  vote       VoteType  @default(unknown)
   user       Users     @relation(fields: [userId], references: [id])
   userId     String
+
+  @@unique([userId, finolierId])
 }
 
 model Users {
