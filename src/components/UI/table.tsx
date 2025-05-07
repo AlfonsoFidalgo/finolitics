@@ -1,5 +1,6 @@
 import { type Finolier } from "@/actions/disqus";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Table({
   data,
@@ -12,7 +13,7 @@ export default function Table({
   return (
     <div className="relative overflow-x-auto">
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <thead className="text-md  uppercase bg-gray-50 dark:bg-gray-700 tracking-wider text-white">
           <tr>
             {columns.map((col) => {
               return (
@@ -32,19 +33,29 @@ export default function Table({
               >
                 <th
                   scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white flex flex-col items-center gap-2"
+                  className="px-2 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                 >
-                  <div>{finolier.displayName}</div>
-                  <Image
-                    className="rounded-full"
-                    src={finolier.avatar}
-                    alt="avatar"
-                    width={50}
-                    height={50}
-                  />
+                  <Link
+                    href={`/${finolier.id}`}
+                    className="flex flex-col items-center gap-1 group"
+                  >
+                    <div className="group-hover:font-semibold">
+                      {finolier.displayName}
+                    </div>
+                    <Image
+                      className="rounded-full opacity-50 group-hover:opacity-100"
+                      src={finolier.avatar}
+                      alt="avatar"
+                      width={50}
+                      height={50}
+                    />
+                  </Link>
                 </th>
-                <td className="px-6 py-4 text-center">
+                <td className="px-2 py-4 text-center text-gray-900 whitespace-nowrap dark:text-white">
                   {finolier.reputation.toFixed(2)}
+                </td>
+                <td className="px-2 py-4 text-center text-gray-900 whitespace-nowrap dark:text-white">
+                  {new Intl.NumberFormat().format(finolier.numPosts)}
                 </td>
               </tr>
             );
