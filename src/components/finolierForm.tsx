@@ -25,25 +25,25 @@ export default function FinolierForm() {
   }, [formState, router]);
 
   return (
-    <div>
+    <div className="text-center w-11/12 md:w-3/4 mx-auto p-2">
       <form
-        className="flex flex-col items-center justify-center mt-8"
+        className="flex flex-col items-center justify-start mt-8"
         action={action}
       >
-        <label className="text-lg font-semibold mb-2">
-          Busca a tu finolier favorito con su usuario de Disqus:
+        <label className="text-lg font-semibold mb-2 sm:w-96 w-full">
+          Busca a tu finolier favorito con su usuario de Disqus
         </label>
         <Image
           src="/disqusId.png"
           alt="Disqus ID"
-          width={300}
-          height={300}
+          width={350}
+          height={350}
           className="mx-auto mb-4"
         />
         <input
           type="text"
           placeholder="Buscar finolier..."
-          className="border border-gray-300 rounded-lg p-4 w-1/4"
+          className="border border-gray-300 rounded-lg p-4 sm:w-96 w-full"
           name="finolier"
           value={finolierId}
           onChange={(e) => setFinolierId(e.target.value)}
@@ -51,7 +51,7 @@ export default function FinolierForm() {
         <button
           type="submit"
           disabled={!finolierId}
-          className="bg-blue-500 text-white rounded-lg p-4 mt-2 w-1/4 uppercase tracking-wider shadow-2xl hover:bg-blue-600"
+          className="bg-blue-500 text-white rounded-lg p-4 mt-2 sm:w-96 w-full uppercase tracking-wider shadow-2xl hover:bg-blue-600"
         >
           {isPending ? "Cargando..." : "Buscar"}
         </button>

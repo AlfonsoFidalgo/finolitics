@@ -7,7 +7,7 @@ export default async function FinolierListPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-center mt-8">
-        Listado de Finoliers
+        Directorio de Finoliers
       </h1>
       <FinolierList finoliers={finoliers} />
     </div>
