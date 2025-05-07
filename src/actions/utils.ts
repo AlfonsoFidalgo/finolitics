@@ -2,6 +2,8 @@
 
 import prisma from "@/db";
 
+import { type Finolier } from "@/actions/disqus";
+
 export async function emitVote(
   userId: string,
   finolierId: string,
@@ -122,5 +124,53 @@ export async function saveUser(userId: string): Promise<{
     return {
       success: false,
     };
+  }
+}
+
+export async function fetchTopReputationFinoliers(): Promise<Finolier[]> {
+  try {
+    const finoliers = await prisma.finoliers.findMany({
+      orderBy: {
+        reputation: "desc",
+      },
+      take: 5,
+    });
+
+    return finoliers;
+  } catch (error: unknown) {
+    console.error("Error fetching top reputation finoliers:", error);
+    return [];
+  }
+}
+
+export async function fetchTopComentators(): Promise<Finolier[]> {
+  try {
+    const finoliers = await prisma.finoliers.findMany({
+      orderBy: {
+        numPosts: "desc",
+      },
+      take: 5,
+    });
+
+    return finoliers;
+  } catch (error: unknown) {
+    console.error("Error fetching top comentators finoliers:", error);
+    return [];
+  }
+}
+
+export async function fetchTopUpvoted(): Promise<Finolier[]> {
+  try {
+    const finoliers = await prisma.finoliers.findMany({
+      orderBy: {
+        numLikesReceived: "desc",
+      },
+      take: 5,
+    });
+
+    return finoliers;
+  } catch (error: unknown) {
+    console.error("Error fetching top upvoteds finoliers:", error);
+    return [];
   }
 }
