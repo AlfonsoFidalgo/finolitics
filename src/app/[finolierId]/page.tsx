@@ -38,7 +38,8 @@ export default async function FinolierPage({
           </h2>
         ))}
       <h2 className="text-xl mb-2 text-center">
-        {finolier.numPosts} comentarios, {finolier.numLikesReceived}
+        {new Intl.NumberFormat().format(finolier.numPosts)} comentarios,{" "}
+        {new Intl.NumberFormat().format(finolier.numLikesReceived)} upvotes.
       </h2>
       <h2 className="text-xl mb-2 text-center">
         {finolier.numFollowers} seguidores, siguiendo a {finolier.numFollowing}
