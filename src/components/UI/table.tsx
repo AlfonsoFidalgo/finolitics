@@ -57,6 +57,9 @@ export default function Table({
                 <td className="px-2 py-4 text-center text-gray-900 whitespace-nowrap dark:text-white">
                   {new Intl.NumberFormat().format(finolier.numPosts)}
                 </td>
+                <td className="px-2 py-4 text-center text-gray-900 whitespace-nowrap dark:text-white">
+                  {new Intl.NumberFormat().format(finolier.numLikesReceived)}
+                </td>
               </tr>
             );
           })}

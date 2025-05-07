@@ -21,7 +21,7 @@ export default async function Home() {
       <div className="my-6 sm:my-10 w-full sm:w-8/12 mx-auto">
         <Table
           data={topUpvoted}
-          columns={["Finolier", "Reputación", "Comentarios"]}
+          columns={["Finolier", "Reputación", "Comentarios", "Upvotes"]}
         />
       </div>
     </>
