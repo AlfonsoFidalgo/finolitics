@@ -1,13 +1,7 @@
-import {
-  fetchTopReputationFinoliers,
-  fetchTopComentators,
-  fetchTopUpvoted,
-} from "@/actions/utils";
+import { fetchTopUpvoted } from "@/actions/utils";
 import Table from "@/components/UI/table";
 
 export default async function Home() {
-  // const topReputationFinoliers = await fetchTopReputationFinoliers();
-  // const topComentators = await fetchTopComentators();
   const topUpvoted = await fetchTopUpvoted();
 
   return (
