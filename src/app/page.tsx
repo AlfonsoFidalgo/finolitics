@@ -19,7 +19,7 @@ export default async function Home() {
         </h1>
       </div>
       <div className="mt-8 w-full sm:w-8/12 mx-auto">
-        <Table data={topUpvoted} />
+        <Table data={topUpvoted} columns={['Finolier', "Reputación"]} />
       </div>
     </>
   );
