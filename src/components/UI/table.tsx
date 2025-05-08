@@ -39,9 +39,6 @@ export default function Table({
                     href={`/${finolier.id}`}
                     className="flex flex-col items-center gap-1 group"
                   >
-                    <div className="group-hover:font-semibold">
-                      {finolier.displayName}
-                    </div>
                     <Image
                       className="rounded-full opacity-75 group-hover:opacity-100"
                       src={finolier.avatar}
