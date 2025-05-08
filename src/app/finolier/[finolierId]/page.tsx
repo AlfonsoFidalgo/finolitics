@@ -2,13 +2,9 @@ import Image from "next/image";
 import FinolierVote from "@/components/finolierVote";
 import { fetchFinolierDetails } from "@/actions/disqus";
 
-export default async function FinolierPage({
-  params,
-}: {
-  params: {
-    finolierId: string;
-  };
-}) {
+type Params = Promise<{ finolierId: string }>;
+
+export default async function FinolierPage({ params }: { params: Params }) {
   const { finolierId } = await params;
   const finolierDetails = await fetchFinolierDetails(finolierId);
   if (!finolierDetails.success) {
