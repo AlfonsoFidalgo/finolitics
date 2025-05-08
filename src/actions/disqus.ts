@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/db";
+import { revalidatePath } from "next/cache";
 
 if (!process.env.DISQUS_API) {
   throw new Error("DISQUS_API_KEY is not defined");
@@ -79,7 +80,7 @@ export async function fetchFinolierDetails(
   }
 
   await prisma.finoliers.create({ data: { ...finolierData } });
-
+  revalidatePath("/top-finoliers");
   return {
     success: true,
     message: "Finolier details fetched successfully",

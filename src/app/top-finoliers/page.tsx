@@ -1,3 +1,4 @@
+// export const revalidate = 60;
 import { fetchTopUpvoted } from "@/actions/utils";
 import Table from "@/components/UI/table";
 
