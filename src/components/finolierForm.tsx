@@ -31,7 +31,7 @@ export default function FinolierForm() {
         action={action}
       >
         <label className="text-lg font-semibold mb-2 sm:w-96 w-full">
-          Busca a a un finolier con su usuario de Disqus
+          Busca a un finolier con su usuario de Disqus
         </label>
         <Image
           src="/disqusId.png"
