@@ -28,34 +28,39 @@ export default function Table({
           {data.map((finolier: Finolier) => {
             return (
               <tr
-                key={finolier.displayName}
-                className=" border-b bg-gray-800 border-gray-700"
+                key={finolier.id}
+                className="border-b bg-gray-800 border-gray-700 hover:bg-gray-600 cursor-pointer"
               >
                 <th
                   scope="row"
                   className="px-2 py-4 font-medium whitespace-nowrap text-white"
                 >
-                  <Link
-                    href={`/${finolier.id}`}
-                    className="flex flex-col items-center gap-1 group"
-                  >
-                    <Image
-                      className="rounded-full opacity-75 group-hover:opacity-100"
-                      src={finolier.avatar}
-                      alt="avatar"
-                      width={50}
-                      height={50}
-                    />
+                  <Link href={`/${finolier.id}`}>
+                    <div className="flex flex-col items-center gap-1">
+                      <Image
+                        className="rounded-full"
+                        src={finolier.avatar}
+                        alt="avatar"
+                        width={50}
+                        height={50}
+                      />
+                    </div>
                   </Link>
                 </th>
                 <td className="px-2 py-4 text-center whitespace-nowrap text-white">
-                  {finolier.reputation.toFixed(2)}
+                  <Link href={`/${finolier.id}`}>
+                    {finolier.reputation.toFixed(2)}
+                  </Link>
                 </td>
                 <td className="px-2 py-4 text-center whitespace-nowrap text-white">
-                  {new Intl.NumberFormat().format(finolier.numPosts)}
+                  <Link href={`/${finolier.id}`}>
+                    {new Intl.NumberFormat().format(finolier.numPosts)}
+                  </Link>
                 </td>
                 <td className="px-2 py-4 text-center whitespace-nowrap text-white">
-                  {new Intl.NumberFormat().format(finolier.numLikesReceived)}
+                  <Link href={`/${finolier.id}`}>
+                    {new Intl.NumberFormat().format(finolier.numLikesReceived)}
+                  </Link>
                 </td>
               </tr>
             );
