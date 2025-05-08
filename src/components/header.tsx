@@ -41,10 +41,10 @@ export default function Header() {
       </h1>
       <div className="flex gap-8 mx-8">
         <Link
-          href="/buscar"
+          href="/top-finoliers"
           className="sm:text-lg font-semibold hover:text-gray-300 transition duration-300"
         >
-          Buscar Finolier
+          Top Finoliers
         </Link>
       </div>
     </header>

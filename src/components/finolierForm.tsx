@@ -31,7 +31,7 @@ export default function FinolierForm() {
         action={action}
       >
         <label className="text-lg font-semibold mb-2 sm:w-96 w-full">
-          Busca a tu finolier favorito con su usuario de Disqus
+          Busca a a un finolier con su usuario de Disqus
         </label>
         <Image
           src="/disqusId.png"
@@ -51,7 +51,7 @@ export default function FinolierForm() {
         <button
           type="submit"
           disabled={!finolierId}
-          className="bg-blue-500 text-white rounded-lg p-4 mt-2 sm:w-96 w-full uppercase tracking-wider shadow-2xl hover:bg-blue-600"
+          className="bg-slate-700 text-white rounded-lg p-4 mt-2 sm:w-96 w-full uppercase tracking-wider shadow-2xl hover:bg-slate-800 cursor-pointer transition duration-300 disabled:opacity-50 disabled:cursor-default"
         >
           {isPending ? "Cargando..." : "Buscar"}
         </button>
