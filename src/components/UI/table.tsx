@@ -60,7 +60,7 @@ export default function Table({
                 </td>
                 <td className="px-2 py-4 text-center whitespace-nowrap text-white">
                   <Link href={`/finolier/${finolier.id}`}>
-                    {new Intl.NumberFormat().format(finolier.numLikesReceived)}
+                    {(finolier.numLikesReceived / finolier.numPosts).toFixed(2)}
                   </Link>
                 </td>
               </tr>
