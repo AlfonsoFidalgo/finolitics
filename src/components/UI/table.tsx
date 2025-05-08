@@ -35,7 +35,7 @@ export default function Table({
                   scope="row"
                   className="px-2 py-4 font-medium whitespace-nowrap text-white"
                 >
-                  <Link href={`/${finolier.id}`}>
+                  <Link href={`/finolier/${finolier.id}`}>
                     <div className="flex flex-col items-center gap-1">
                       <Image
                         className="rounded-full"
@@ -49,17 +49,17 @@ export default function Table({
                   </Link>
                 </th>
                 <td className="px-2 py-4 text-center whitespace-nowrap text-white">
-                  <Link href={`/${finolier.id}`}>
+                  <Link href={`/finolier/${finolier.id}`}>
                     {finolier.reputation.toFixed(2)}
                   </Link>
                 </td>
                 <td className="px-2 py-4 text-center whitespace-nowrap text-white">
-                  <Link href={`/${finolier.id}`}>
+                  <Link href={`/finolier/${finolier.id}`}>
                     {new Intl.NumberFormat().format(finolier.numPosts)}
                   </Link>
                 </td>
                 <td className="px-2 py-4 text-center whitespace-nowrap text-white">
-                  <Link href={`/${finolier.id}`}>
+                  <Link href={`/finolier/${finolier.id}`}>
                     {new Intl.NumberFormat().format(finolier.numLikesReceived)}
                   </Link>
                 </td>

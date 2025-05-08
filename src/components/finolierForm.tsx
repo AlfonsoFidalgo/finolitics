@@ -17,7 +17,7 @@ export default function FinolierForm() {
   useEffect(() => {
     if (formState.success) {
       const { finolier } = formState;
-      router.push(`/${finolier.id}`);
+      router.push(`/finolier/${finolier.id}`);
     }
     if (formState.success !== null) {
       setFinolierId("");
