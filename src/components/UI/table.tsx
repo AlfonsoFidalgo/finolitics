@@ -44,6 +44,7 @@ export default function Table({
                         width={50}
                         height={50}
                       />
+                      <p>{finolier.displayName}</p>
                     </div>
                   </Link>
                 </th>
