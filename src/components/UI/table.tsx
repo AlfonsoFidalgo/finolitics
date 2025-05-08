@@ -13,11 +13,11 @@ export default function Table({
   return (
     <div className="relative overflow-x-auto">
       <table className="w-full text-sm text-left rtl:text-right text-gray-400">
-        <thead className="text-md  uppercase bg-gray-700 tracking-wider text-white">
+        <thead className="text-md  uppercase bg-gray-700 text-white">
           <tr>
             {columns.map((col) => {
               return (
-                <th key={col} scope="col" className="px-6 py-3 text-center">
+                <th key={col} scope="col" className="px-2 py-3 text-center">
                   {col}
                 </th>
               );
