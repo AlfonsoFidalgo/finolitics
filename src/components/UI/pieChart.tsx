@@ -46,11 +46,11 @@ export default function Chart({
     { name: "dislike", value: votes.dislike },
   ];
   return (
-    <PieChart width={300} height={300}>
+    <PieChart width={250} height={250}>
       <Pie
         data={data}
-        cx={150}
-        cy={150}
+        cx={125}
+        cy={125}
         labelLine={false}
         label={renderCustomizedLabel}
         outerRadius={100}

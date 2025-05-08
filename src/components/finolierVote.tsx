@@ -55,7 +55,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
 
   return (
     <>
-      <div className="flex gap-4 mt-4">
+      <div className="flex gap-2 mt-2">
         <button
           className={`bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600 ${
             !userId ? "opacity-50 cursor-not-allowed" : ""
