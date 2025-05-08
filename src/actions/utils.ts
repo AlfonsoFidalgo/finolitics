@@ -165,7 +165,7 @@ export async function fetchTopUpvoted(): Promise<Finolier[]> {
       orderBy: {
         numLikesReceived: "desc",
       },
-      take: 5,
+      take: 10,
     });
 
     return finoliers;
