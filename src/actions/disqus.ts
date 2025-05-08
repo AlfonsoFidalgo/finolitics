@@ -32,7 +32,8 @@ export async function fetchFinoliers(): Promise<Finolier[]> {
 export async function fetchFinolierDetails(
   id: string
 ): Promise<FinolierFormState> {
-  const url = `https://disqus.com/api/3.0/users/details?user=username%3A${id}&api_key=${process.env.DISQUS_API}`;
+  const sanitizedId = id[0] === "@" ? id.slice(1) : id;
+  const url = `https://disqus.com/api/3.0/users/details?user=username%3A${sanitizedId}&api_key=${process.env.DISQUS_API}`;
   const res = await fetch(url, {
     method: "GET",
     headers: {
@@ -48,7 +49,7 @@ export async function fetchFinolierDetails(
   }
   const data = await res.json();
   const finolierData = {
-    id,
+    id: sanitizedId,
     displayName: data.response.name,
     avatar: data.response.avatar?.permalink,
     about: data.response.about,
