@@ -44,13 +44,7 @@ export default function Header() {
           href="/buscar"
           className="sm:text-lg font-semibold hover:text-gray-300 transition duration-300"
         >
-          Buscar
-        </Link>
-        <Link
-          href="/listado"
-          className="sm:text-lg font-semibold hover:text-gray-300 transition duration-300"
-        >
-          Listado
+          Buscar Finolier
         </Link>
       </div>
     </header>
