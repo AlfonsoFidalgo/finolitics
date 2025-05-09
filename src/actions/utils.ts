@@ -4,12 +4,33 @@ import prisma from "@/db";
 
 import { type Finolier } from "@/actions/disqus";
 
+interface EmitVoteFormState {
+  success: boolean;
+  message: string;
+  vote: "like" | "dislike" | "unknown" | undefined;
+}
+
 export async function emitVote(
-  userId: string,
+  userId: string | null,
   finolierId: string,
-  vote: "like" | "dislike" | "unknown",
+  vote: "like" | "dislike" | "unknown" | undefined,
   currentVote: "like" | "dislike" | "unknown" | undefined
-): Promise<{ success: boolean; message: string }> {
+): Promise<EmitVoteFormState> {
+  if (!userId) {
+    return {
+      success: false,
+      message: "No se ha encontrado el usuario",
+      vote: currentVote,
+    };
+  }
+  if (!vote) {
+    return {
+      success: false,
+      message: "No se ha encontrado el voto",
+      vote: currentVote,
+    };
+  }
+
   try {
     if (!currentVote) {
       const newVote = await prisma.votes.create({
@@ -19,11 +40,11 @@ export async function emitVote(
           vote,
         },
       });
-      console.log("newVote", newVote);
 
       return {
         success: true,
         message: "Voto emitido correctamente",
+        vote: newVote.vote,
       };
     } else {
       const updatedVote = await prisma.votes.update({
@@ -42,6 +63,7 @@ export async function emitVote(
       return {
         success: true,
         message: "Voto actualizado correctamente",
+        vote: updatedVote.vote,
       };
     }
   } catch (error: unknown) {
@@ -50,6 +72,7 @@ export async function emitVote(
       message: `Error al emitir el voto: ${
         error instanceof Error ? error.message : "desconocido"
       }`,
+      vote: currentVote,
     };
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { useUserContext } from "@/contexts/userContext";
 import Chart from "@/components/UI/pieChart";
 import { emitVote } from "@/actions/utils";
@@ -11,24 +12,26 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
   const [vote, setVote] = useState<"like" | "dislike" | "unknown" | undefined>(
     undefined
   );
-  const [loading, setLoading] = useState(false);
+  const [newVote, setNewVote] = useState<
+    "like" | "dislike" | "unknown" | undefined
+  >(undefined);
+  const [formState, action] = useActionState(
+    emitVote.bind(null, userId, finolierId, newVote, vote),
+    {
+      success: false,
+      message: "",
+      vote: undefined,
+    }
+  );
 
   const summaryVotes = useSummaryVotes(finolierId, userId, setVote, vote);
 
-  async function handleVote(newVote: "like" | "dislike" | "unknown") {
-    if (!userId) {
-      console.error("No userId found");
-      return;
+  useEffect(() => {
+    if (formState.success) {
+      setVote(formState.vote);
+      setNewVote(undefined);
     }
-    setLoading(true);
-    const result = await emitVote(userId, finolierId, newVote, vote);
-    if (result.success) {
-      setVote(newVote);
-    } else {
-      console.error(result.message);
-    }
-    setLoading(false);
-  }
+  }, [formState]);
 
   return (
     <>
@@ -36,36 +39,71 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
         <div className="relative">
           {summaryVotes && <Chart votes={summaryVotes} />}
         </div>
-        <div className="flex gap-4 absolute bottom-5 mb-4 w-90">
-          <button
-            className={`bg-green-600 text-white w-1/3 text-sm h-14 rounded shadow-md hover:bg-green-700 ${
+        <form
+          action={action}
+          className="flex gap-4 absolute bottom-5 mb-4 w-90"
+        >
+          <VoteButton
+            label="Me cae bien"
+            value="like"
+            style={`bg-green-600 hover:bg-green-700 ${
               !userId ? "opacity-50 cursor-not-allowed" : ""
             } ${vote === "like" ? "underline font-bold" : ""}`}
-            disabled={!userId}
-            onClick={() => handleVote("like")}
-          >
-            {loading ? "Cargando..." : "Me cae bien"}
-          </button>
-          <button
-            className={`bg-gray-600 text-white w-1/3 text-sm h-14 rounded shadow-md hover:bg-gray-700 ${
+            onVote={() => {
+              setNewVote("like");
+            }}
+          />
+          <VoteButton
+            label="No sé quién es"
+            value="unknown"
+            style={`bg-gray-600 hover:bg-gray-700 ${
               !userId ? "opacity-50 cursor-not-allowed" : ""
             } ${vote === "unknown" ? "underline font-bold" : ""}`}
-            disabled={!userId}
-            onClick={() => handleVote("unknown")}
-          >
-            {loading ? "Cargando..." : "No sé quién es"}
-          </button>
-          <button
-            className={`bg-rose-600 text-white w-1/3 text-sm h-14 rounded shadow-md hover:bg-rose-700 ${
+            onVote={() => {
+              setNewVote("unknown");
+            }}
+          />
+          <VoteButton
+            label="Me cae mal"
+            value="dislike"
+            style={`bg-rose-600 hover:bg-rose-700 ${
               !userId ? "opacity-50 cursor-not-allowed" : ""
             } ${vote === "dislike" ? "underline font-bold" : ""}`}
-            disabled={!userId}
-            onClick={() => handleVote("dislike")}
-          >
-            {loading ? "Cargando..." : "Me cae mal"}
-          </button>
-        </div>
+            onVote={() => {
+              setNewVote("dislike");
+            }}
+          />
+        </form>
       </div>
     </>
+  );
+}
+
+function VoteButton({
+  label,
+  value,
+  style,
+  onVote,
+}: {
+  label: string;
+  value: string;
+  style: string;
+  onVote: () => void;
+}) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      name="vote"
+      value={value}
+      type="submit"
+      disabled={pending}
+      onClick={onVote}
+      className={`text-white w-1/3 text-sm h-14 rounded shadow-md ${style} ${
+        pending ? "cursor-not-allowed opacity-50" : ""
+      }`}
+    >
+      {pending ? "..." : label}
+    </button>
   );
 }
