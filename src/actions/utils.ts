@@ -127,6 +127,29 @@ export async function saveUser(userId: string): Promise<{
   }
 }
 
+export async function fetchUser(userId: string) {
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (user) {
+      return {
+        success: true,
+      };
+    }
+    return {
+      success: false,
+    };
+  } catch (error: unknown) {
+    console.error("Error fetching user:", error);
+    return {
+      success: false,
+    };
+  }
+}
+
 export async function fetchTopReputationFinoliers(): Promise<Finolier[]> {
   try {
     const finoliers = await prisma.finoliers.findMany({
