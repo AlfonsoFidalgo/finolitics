@@ -1,44 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUserContext } from "@/contexts/userContext";
 import Chart from "@/components/UI/pieChart";
-import { emitVote, fetchUserVote, fetchFinolierVotes } from "@/actions/utils";
+import { emitVote } from "@/actions/utils";
+import useSummaryVotes from "@/hooks/useSummaryVotes";
 
 export default function FinolierVote({ finolierId }: { finolierId: string }) {
   const { userId } = useUserContext();
   const [vote, setVote] = useState<"like" | "dislike" | "unknown" | undefined>(
     undefined
   );
-  const [summaryVotes, setSummaryVotes] = useState<{
-    like: number;
-    dislike: number;
-    unknown: number;
-  } | null>(null);
 
-  useEffect(() => {
-    async function fetchVotes() {
-      if (!finolierId) return;
-      const summary = await fetchFinolierVotes(finolierId);
-      if (!summary) {
-        setSummaryVotes({
-          like: 0,
-          dislike: 0,
-          unknown: 0,
-        });
-        return;
-      }
-      setSummaryVotes(summary);
-    }
-    async function fetchVote() {
-      if (!finolierId || !userId) return;
-      const userVote = await fetchUserVote(finolierId, userId);
-
-      setVote(userVote);
-    }
-    fetchVote();
-    fetchVotes();
-  }, [finolierId, userId, vote]);
+  const summaryVotes = useSummaryVotes(finolierId, userId, setVote, vote);
 
   async function handleVote(newVote: "like" | "dislike" | "unknown") {
     if (!userId) {
