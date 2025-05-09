@@ -55,36 +55,40 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
 
   return (
     <>
-      <div className="flex gap-2 mt-2">
-        <button
-          className={`bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600 ${
-            !userId ? "opacity-50 cursor-not-allowed" : ""
-          } ${vote === "like" ? "underline font-bold" : ""}`}
-          disabled={!userId}
-          onClick={() => handleVote("like")}
-        >
-          Me cae bien
-        </button>
-        <button
-          className={`bg-slate-500 text-white px-4 py-2 rounded shadow-md hover:bg-slate-600 ${
-            !userId ? "opacity-50 cursor-not-allowed" : ""
-          } ${vote === "unknown" ? "underline font-bold" : ""}`}
-          disabled={!userId}
-          onClick={() => handleVote("unknown")}
-        >
-          No sé quién es
-        </button>
-        <button
-          className={`bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 ${
-            !userId ? "opacity-50 cursor-not-allowed" : ""
-          } ${vote === "dislike" ? "underline font-bold" : ""}`}
-          disabled={!userId}
-          onClick={() => handleVote("dislike")}
-        >
-          Me cae mal
-        </button>
+      <div className="flex flex-col items-center gap-0 mt-0 relative">
+        <div className="relative">
+          {summaryVotes && <Chart votes={summaryVotes} />}
+        </div>
+        <div className="flex gap-4 absolute bottom-5 mb-4 w-90">
+          <button
+            className={`bg-green-600 text-white w-1/3 text-sm h-14 rounded shadow-md hover:bg-green-700 ${
+              !userId ? "opacity-50 cursor-not-allowed" : ""
+            } ${vote === "like" ? "underline font-bold" : ""}`}
+            disabled={!userId}
+            onClick={() => handleVote("like")}
+          >
+            Me cae bien
+          </button>
+          <button
+            className={`bg-gray-600 text-white w-1/3 text-sm h-14 rounded shadow-md hover:bg-gray-700 ${
+              !userId ? "opacity-50 cursor-not-allowed" : ""
+            } ${vote === "unknown" ? "underline font-bold" : ""}`}
+            disabled={!userId}
+            onClick={() => handleVote("unknown")}
+          >
+            No sé quién es
+          </button>
+          <button
+            className={`bg-rose-600 text-white w-1/3 text-sm h-14 rounded shadow-md hover:bg-rose-700 ${
+              !userId ? "opacity-50 cursor-not-allowed" : ""
+            } ${vote === "dislike" ? "underline font-bold" : ""}`}
+            disabled={!userId}
+            onClick={() => handleVote("dislike")}
+          >
+            Me cae mal
+          </button>
+        </div>
       </div>
-      {summaryVotes && <Chart votes={summaryVotes} />}
     </>
   );
 }
