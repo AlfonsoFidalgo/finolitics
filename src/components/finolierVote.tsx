@@ -11,6 +11,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
   const [vote, setVote] = useState<"like" | "dislike" | "unknown" | undefined>(
     undefined
   );
+  const [loading, setLoading] = useState(false);
 
   const summaryVotes = useSummaryVotes(finolierId, userId, setVote, vote);
 
@@ -19,12 +20,14 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
       console.error("No userId found");
       return;
     }
+    setLoading(true);
     const result = await emitVote(userId, finolierId, newVote, vote);
     if (result.success) {
       setVote(newVote);
     } else {
       console.error(result.message);
     }
+    setLoading(false);
   }
 
   return (
@@ -41,7 +44,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
             disabled={!userId}
             onClick={() => handleVote("like")}
           >
-            Me cae bien
+            {loading ? "Cargando..." : "Me cae bien"}
           </button>
           <button
             className={`bg-gray-600 text-white w-1/3 text-sm h-14 rounded shadow-md hover:bg-gray-700 ${
@@ -50,7 +53,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
             disabled={!userId}
             onClick={() => handleVote("unknown")}
           >
-            No sé quién es
+            {loading ? "Cargando..." : "No sé quién es"}
           </button>
           <button
             className={`bg-rose-600 text-white w-1/3 text-sm h-14 rounded shadow-md hover:bg-rose-700 ${
@@ -59,7 +62,7 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
             disabled={!userId}
             onClick={() => handleVote("dislike")}
           >
-            Me cae mal
+            {loading ? "Cargando..." : "Me cae mal"}
           </button>
         </div>
       </div>

@@ -18,14 +18,6 @@ export default function useSummaryVotes(
     async function fetchVotes() {
       if (!finolierId) return;
       const summary = await fetchFinolierVotes(finolierId);
-      if (!summary) {
-        setSummaryVotes({
-          like: 0,
-          dislike: 0,
-          unknown: 0,
-        });
-        return;
-      }
       setSummaryVotes(summary);
     }
     async function fetchVote() {
