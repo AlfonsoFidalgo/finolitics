@@ -70,11 +70,10 @@ export async function emitVote(
       };
     }
   } catch (error: unknown) {
+    console.error("Error al emitir el voto:", error);
     return {
       success: false,
-      message: `Error al emitir el voto: ${
-        error instanceof Error ? error.message : "desconocido"
-      }`,
+      message: "Error al emitir el voto",
       vote: currentVote,
     };
   }
