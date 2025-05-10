@@ -1,90 +1,94 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { useUserContext } from "@/contexts/userContext";
 import Chart from "@/components/UI/pieChart";
-import { emitVote, fetchUserVote, fetchFinolierVotes } from "@/actions/utils";
+import { emitVote } from "@/actions/utils";
+import useSummaryVotes from "@/hooks/useSummaryVotes";
 
 export default function FinolierVote({ finolierId }: { finolierId: string }) {
   const { userId } = useUserContext();
   const [vote, setVote] = useState<"like" | "dislike" | "unknown" | undefined>(
     undefined
   );
-  const [summaryVotes, setSummaryVotes] = useState<{
-    like: number;
-    dislike: number;
-    unknown: number;
-  } | null>(null);
+
+  const [formState, action] = useActionState(emitVote, {
+    success: false,
+    message: "init",
+    vote: undefined,
+  });
+
+  const summaryVotes = useSummaryVotes(finolierId, userId, setVote, vote);
 
   useEffect(() => {
-    async function fetchVotes() {
-      if (!finolierId) return;
-      const summary = await fetchFinolierVotes(finolierId);
-      if (!summary) {
-        setSummaryVotes({
-          like: 0,
-          dislike: 0,
-          unknown: 0,
-        });
-        return;
-      }
-      setSummaryVotes(summary);
+    if (formState.success) {
+      setVote(formState.vote);
     }
-    async function fetchVote() {
-      if (!finolierId || !userId) return;
-      const userVote = await fetchUserVote(finolierId, userId);
-
-      setVote(userVote);
-    }
-    fetchVote();
-    fetchVotes();
-  }, [finolierId, userId, vote]);
-
-  async function handleVote(newVote: "like" | "dislike" | "unknown") {
-    if (!userId) {
-      console.error("No userId found");
-      return;
-    }
-    const result = await emitVote(userId, finolierId, newVote, vote);
-    if (result.success) {
-      setVote(newVote);
-    } else {
-      console.error(result.message);
-    }
-  }
+  }, [formState]);
 
   return (
     <>
-      <div className="flex gap-2 mt-2">
-        <button
-          className={`bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600 ${
-            !userId ? "opacity-50 cursor-not-allowed" : ""
-          } ${vote === "like" ? "underline font-bold" : ""}`}
-          disabled={!userId}
-          onClick={() => handleVote("like")}
+      <div className="flex flex-col items-center gap-0 mt-0 relative">
+        <div className="relative">
+          {summaryVotes && <Chart votes={summaryVotes} />}
+        </div>
+        <form
+          action={action}
+          className="flex gap-4 absolute bottom-5 mb-4 w-90"
         >
-          Me cae bien
-        </button>
-        <button
-          className={`bg-slate-500 text-white px-4 py-2 rounded shadow-md hover:bg-slate-600 ${
-            !userId ? "opacity-50 cursor-not-allowed" : ""
-          } ${vote === "unknown" ? "underline font-bold" : ""}`}
-          disabled={!userId}
-          onClick={() => handleVote("unknown")}
-        >
-          No sé quién es
-        </button>
-        <button
-          className={`bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 ${
-            !userId ? "opacity-50 cursor-not-allowed" : ""
-          } ${vote === "dislike" ? "underline font-bold" : ""}`}
-          disabled={!userId}
-          onClick={() => handleVote("dislike")}
-        >
-          Me cae mal
-        </button>
+          <input type="hidden" name="finolierId" value={finolierId} />
+          <input type="hidden" name="userId" value={userId || ""} />
+          <input type="hidden" name="currentVote" value={vote || ""} />
+          <VoteButton
+            label="Me cae bien"
+            value="like"
+            style={`bg-green-600 hover:bg-green-700 ${
+              !userId ? "opacity-50 cursor-not-allowed" : ""
+            } ${vote === "like" ? "underline font-bold" : ""}`}
+          />
+          <VoteButton
+            label="No sé quién es"
+            value="unknown"
+            style={`bg-gray-600 hover:bg-gray-700 ${
+              !userId ? "opacity-50 cursor-not-allowed" : ""
+            } ${vote === "unknown" ? "underline font-bold" : ""}`}
+          />
+          <VoteButton
+            label="Me cae mal"
+            value="dislike"
+            style={`bg-rose-600 hover:bg-rose-700 ${
+              !userId ? "opacity-50 cursor-not-allowed" : ""
+            } ${vote === "dislike" ? "underline font-bold" : ""}`}
+          />
+        </form>
       </div>
-      {summaryVotes && <Chart votes={summaryVotes} />}
     </>
+  );
+}
+
+function VoteButton({
+  label,
+  value,
+  style,
+}: {
+  label: string;
+  value: string;
+  style: string;
+}) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      name="vote"
+      value={value}
+      type="submit"
+      disabled={pending}
+      className={`text-white w-1/3 text-sm h-14 rounded shadow-md ${style} ${
+        pending ? "cursor-not-allowed opacity-50" : ""
+      }`}
+    >
+      {pending ? "..." : label}
+    </button>
   );
 }

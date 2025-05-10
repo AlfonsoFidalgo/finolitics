@@ -4,12 +4,31 @@ import prisma from "@/db";
 
 import { type Finolier } from "@/actions/disqus";
 
+interface EmitVoteFormState {
+  success: boolean;
+  message: string;
+  vote: "like" | "dislike" | "unknown" | undefined;
+}
+
+type Vote = "like" | "dislike" | "unknown" | undefined;
+
 export async function emitVote(
-  userId: string,
-  finolierId: string,
-  vote: "like" | "dislike" | "unknown",
-  currentVote: "like" | "dislike" | "unknown" | undefined
-): Promise<{ success: boolean; message: string }> {
+  currState: EmitVoteFormState,
+  formData: FormData
+): Promise<EmitVoteFormState> {
+  const userId = formData.get("userId") as string | null;
+  const finolierId = formData.get("finolierId") as string;
+  const vote = formData.get("vote") as Vote;
+  const currentVote = formData.get("currentVote") as Vote;
+
+  if (!userId || !finolierId || !vote) {
+    return {
+      success: false,
+      message: "Información incompleta",
+      vote: currentVote,
+    };
+  }
+
   try {
     if (!currentVote) {
       const newVote = await prisma.votes.create({
@@ -19,11 +38,17 @@ export async function emitVote(
           vote,
         },
       });
-      console.log("newVote", newVote);
 
       return {
         success: true,
         message: "Voto emitido correctamente",
+        vote: newVote.vote,
+      };
+    } else if (vote === currentVote) {
+      return {
+        success: true,
+        message: "Voto no cambiado",
+        vote: currentVote,
       };
     } else {
       const updatedVote = await prisma.votes.update({
@@ -37,19 +62,19 @@ export async function emitVote(
           vote,
         },
       });
-      console.log("updatedVote", updatedVote);
 
       return {
         success: true,
         message: "Voto actualizado correctamente",
+        vote: updatedVote.vote,
       };
     }
   } catch (error: unknown) {
+    console.error("Error al emitir el voto:", error);
     return {
       success: false,
-      message: `Error al emitir el voto: ${
-        error instanceof Error ? error.message : "desconocido"
-      }`,
+      message: "Error al emitir el voto",
+      vote: currentVote,
     };
   }
 }
@@ -121,6 +146,29 @@ export async function saveUser(userId: string): Promise<{
     };
   } catch (error: unknown) {
     console.error("Error saving user:", error);
+    return {
+      success: false,
+    };
+  }
+}
+
+export async function fetchUser(userId: string) {
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (user) {
+      return {
+        success: true,
+      };
+    }
+    return {
+      success: false,
+    };
+  } catch (error: unknown) {
+    console.error("Error fetching user:", error);
     return {
       success: false,
     };

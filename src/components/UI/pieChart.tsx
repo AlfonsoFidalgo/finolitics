@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell } from "recharts";
 
-const COLORS = ["#00C950", "#61738E", "#FA2C37"];
+const COLORS = ["#00A53D", "#44556C", "#EC0040"];
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({
@@ -53,9 +53,11 @@ export default function Chart({
         cy={125}
         labelLine={false}
         label={renderCustomizedLabel}
-        outerRadius={100}
+        outerRadius={120}
         fill="#8884d8"
         dataKey="value"
+        startAngle={180}
+        endAngle={0}
       >
         {data.map((entry, index) => (
           <Cell key={`cell-${index}`} fill={COLORS[index]} />
