@@ -12,24 +12,18 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
   const [vote, setVote] = useState<"like" | "dislike" | "unknown" | undefined>(
     undefined
   );
-  const [newVote, setNewVote] = useState<
-    "like" | "dislike" | "unknown" | undefined
-  >(undefined);
-  const [formState, action] = useActionState(
-    emitVote.bind(null, userId, finolierId, newVote, vote),
-    {
-      success: false,
-      message: "",
-      vote: undefined,
-    }
-  );
+
+  const [formState, action] = useActionState(emitVote, {
+    success: false,
+    message: "init",
+    vote: undefined,
+  });
 
   const summaryVotes = useSummaryVotes(finolierId, userId, setVote, vote);
 
   useEffect(() => {
     if (formState.success) {
       setVote(formState.vote);
-      setNewVote(undefined);
     }
   }, [formState]);
 
@@ -43,15 +37,15 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
           action={action}
           className="flex gap-4 absolute bottom-5 mb-4 w-90"
         >
+          <input type="hidden" name="finolierId" value={finolierId} />
+          <input type="hidden" name="userId" value={userId || ""} />
+          <input type="hidden" name="currentVote" value={vote || ""} />
           <VoteButton
             label="Me cae bien"
             value="like"
             style={`bg-green-600 hover:bg-green-700 ${
               !userId ? "opacity-50 cursor-not-allowed" : ""
             } ${vote === "like" ? "underline font-bold" : ""}`}
-            onVote={() => {
-              setNewVote("like");
-            }}
           />
           <VoteButton
             label="No sé quién es"
@@ -59,9 +53,6 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
             style={`bg-gray-600 hover:bg-gray-700 ${
               !userId ? "opacity-50 cursor-not-allowed" : ""
             } ${vote === "unknown" ? "underline font-bold" : ""}`}
-            onVote={() => {
-              setNewVote("unknown");
-            }}
           />
           <VoteButton
             label="Me cae mal"
@@ -69,9 +60,6 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
             style={`bg-rose-600 hover:bg-rose-700 ${
               !userId ? "opacity-50 cursor-not-allowed" : ""
             } ${vote === "dislike" ? "underline font-bold" : ""}`}
-            onVote={() => {
-              setNewVote("dislike");
-            }}
           />
         </form>
       </div>
@@ -83,12 +71,10 @@ function VoteButton({
   label,
   value,
   style,
-  onVote,
 }: {
   label: string;
   value: string;
   style: string;
-  onVote: () => void;
 }) {
   const { pending } = useFormStatus();
 
@@ -98,7 +84,6 @@ function VoteButton({
       value={value}
       type="submit"
       disabled={pending}
-      onClick={onVote}
       className={`text-white w-1/3 text-sm h-14 rounded shadow-md ${style} ${
         pending ? "cursor-not-allowed opacity-50" : ""
       }`}

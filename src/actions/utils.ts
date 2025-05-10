@@ -10,23 +10,20 @@ interface EmitVoteFormState {
   vote: "like" | "dislike" | "unknown" | undefined;
 }
 
+type Vote = "like" | "dislike" | "unknown" | undefined;
+
 export async function emitVote(
-  userId: string | null,
-  finolierId: string,
-  vote: "like" | "dislike" | "unknown" | undefined,
-  currentVote: "like" | "dislike" | "unknown" | undefined
+  currState: EmitVoteFormState,
+  formData: FormData
 ): Promise<EmitVoteFormState> {
-  if (!userId) {
+  const userId = formData.get("userId") as string | null;
+  const finolierId = formData.get("finolierId") as string;
+  const vote = formData.get("vote") as Vote;
+  const currentVote = formData.get("currentVote") as Vote;
+  if (!userId || !finolierId || !vote) {
     return {
       success: false,
-      message: "No se ha encontrado el usuario",
-      vote: currentVote,
-    };
-  }
-  if (!vote) {
-    return {
-      success: false,
-      message: "No se ha encontrado el voto",
+      message: "Información incompleta",
       vote: currentVote,
     };
   }
@@ -58,7 +55,6 @@ export async function emitVote(
           vote,
         },
       });
-      console.log("updatedVote", updatedVote);
 
       return {
         success: true,
