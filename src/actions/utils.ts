@@ -20,6 +20,7 @@ export async function emitVote(
   const finolierId = formData.get("finolierId") as string;
   const vote = formData.get("vote") as Vote;
   const currentVote = formData.get("currentVote") as Vote;
+
   if (!userId || !finolierId || !vote) {
     return {
       success: false,
@@ -42,6 +43,12 @@ export async function emitVote(
         success: true,
         message: "Voto emitido correctamente",
         vote: newVote.vote,
+      };
+    } else if (vote === currentVote) {
+      return {
+        success: true,
+        message: "Voto no cambiado",
+        vote: currentVote,
       };
     } else {
       const updatedVote = await prisma.votes.update({
