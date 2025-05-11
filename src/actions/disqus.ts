@@ -68,10 +68,15 @@ export async function fetchFinolierDetails(
   });
 
   if (existingFinolier) {
-    await prisma.finoliers.update({
-      where: { id: finolierData.id },
-      data: { ...finolierData },
-    });
+    const updatedAt = new Date(existingFinolier.updatedAt);
+    const hoursAgo24 = new Date(Date.now() - 1000 * 60 * 60 * 24);
+    if (updatedAt < hoursAgo24) {
+      console.log("Updating finolier data");
+      await prisma.finoliers.update({
+        where: { id: finolierData.id },
+        data: { ...finolierData },
+      });
+    }
     return {
       success: true,
       message: "Finolier details updated successfully",
