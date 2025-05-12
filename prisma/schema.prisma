@@ -19,6 +19,7 @@ model Finoliers {
   avatar           String
   about            String
   location         String
+  isPrivate        Boolean
   numFollowers     Int
   numFollowing     Int
   numPosts         Int
@@ -67,4 +68,24 @@ model Tags {
 
   @@index([finolierId])
   @@index([userId])
+}
+
+model Posts {
+  id         String    @id
+  finolier   Finoliers @relation(fields: [finolierId], references: [id])
+  finolierId String
+  createdAt  DateTime  @default(now())
+  thread     Threads   @relation(fields: [threadId], references: [id])
+  threadId   String
+  message    String
+  likes      Int       @default(0)
+  dislikes   Int       @default(0)
+}
+
+model Threads {
+  id        String   @id
+  posts     Posts[]
+  createdAt DateTime @default(now())
+  link      String
+  title     String
 }
