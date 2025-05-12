@@ -14,7 +14,11 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | null>(null);
 
 export const UserContextProvider = ({ children }: UserContextProviderProps) => {
-  const [userId, setUserId] = useState<string | null>(null);
+  const getUserId = () => {
+    if (typeof window === "undefined" || !window.localStorage) return null;
+    return window.localStorage.getItem("userId");
+  };
+  const [userId, setUserId] = useState<string | null>(getUserId);
 
   return (
     <UserContext.Provider value={{ userId, setUserId }}>

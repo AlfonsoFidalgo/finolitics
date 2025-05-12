@@ -152,7 +152,7 @@ export async function saveUser(userId: string): Promise<{
   }
 }
 
-export async function fetchUser(userId: string) {
+export async function isUserInDB(userId: string): Promise<boolean> {
   try {
     const user = await prisma.users.findUnique({
       where: {
@@ -160,18 +160,12 @@ export async function fetchUser(userId: string) {
       },
     });
     if (user) {
-      return {
-        success: true,
-      };
+      return true;
     }
-    return {
-      success: false,
-    };
+    return false;
   } catch (error: unknown) {
     console.error("Error fetching user:", error);
-    return {
-      success: false,
-    };
+    return false;
   }
 }
 

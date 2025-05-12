@@ -6,9 +6,8 @@ import useStoreUserId from "@/hooks/useStoreUserId";
 
 export default function Header() {
   const { userId, setUserId } = useUserContext();
-  console.log("userId", userId);
 
-  useStoreUserId(setUserId);
+  useStoreUserId(userId, setUserId);
 
   return (
     <header className="bg-slate-800 text-white sm:p-4 py-4 flex items-center justify-between w-full">
