@@ -19,6 +19,7 @@ model Finoliers {
   avatar           String
   about            String
   location         String
+  isPrivate        Boolean
   numFollowers     Int
   numFollowing     Int
   numPosts         Int
@@ -28,6 +29,7 @@ model Finoliers {
   createdAt        DateTime @default(now())
   votes            Votes[]
   tags             Tags[]
+  Posts            Posts[]
 }
 
 enum VoteType {
@@ -67,4 +69,27 @@ model Tags {
 
   @@index([finolierId])
   @@index([userId])
+}
+
+model Posts {
+  id         String    @id
+  finolier   Finoliers @relation(fields: [finolierId], references: [id])
+  finolierId String
+  createdAt  DateTime  @default(now())
+  thread     Threads   @relation(fields: [threadId], references: [id])
+  threadId   String
+  message    String
+  likes      Int       @default(0)
+  dislikes   Int       @default(0)
+  // parent     Posts?    @relation("PostToPost", fields: [parentId], references: [id])
+  // parentId   String?
+  // children   Posts[]   @relation("PostToPost")
+}
+
+model Threads {
+  id        String   @id
+  posts     Posts[]
+  createdAt DateTime @default(now())
+  link      String
+  title     String
 }
