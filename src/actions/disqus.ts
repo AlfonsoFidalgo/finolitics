@@ -18,6 +18,7 @@ export interface Finolier {
   numPosts: number;
   reputation: number;
   numLikesReceived: number;
+  isPrivate: boolean;
 }
 
 interface FinolierFormState {
@@ -60,6 +61,7 @@ export async function fetchFinolierDetails(
     numPosts: data.response.numPosts,
     reputation: data.response.reputation,
     numLikesReceived: data.response.numLikesReceived,
+    isPrivate: data.response.isPrivate,
   };
 
   // check if finolier already exists in the database
