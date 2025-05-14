@@ -183,9 +183,6 @@ export async function fetchFinolierPosts(
       dislikes: number;
       parent: string | null;
     }) => {
-      if (post.parent) {
-        return null;
-      }
       return {
         id: post.id,
         finolierId,
@@ -194,8 +191,19 @@ export async function fetchFinolierPosts(
         message: post.raw_message,
         likes: post.likes,
         dislikes: post.dislikes,
+        parent: post.parent,
       };
     }
   );
-  return posts;
+  return posts.filter(
+    (post: {
+      id: string;
+      createdAt: string;
+      thread: string;
+      raw_message: string;
+      likes: number;
+      dislikes: number;
+      parent: string | null;
+    }) => post.parent === null
+  );
 }
