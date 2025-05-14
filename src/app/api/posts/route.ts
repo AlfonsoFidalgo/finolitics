@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import prisma from "@/db";
 
-
 export async function GET() {
   const headersList = await headers();
   if (
@@ -39,7 +38,7 @@ export async function GET() {
   };
 
   try {
-    prisma.threads.create({
+    await prisma.threads.create({
       data: threadPayload,
     });
     return new Response(JSON.stringify({ message: "All good" }), {
