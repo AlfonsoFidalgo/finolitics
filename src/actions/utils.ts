@@ -216,3 +216,22 @@ export async function fetchTopUpvoted(): Promise<Finolier[]> {
     return [];
   }
 }
+
+export async function fetchNonPrivateFinoliers(): Promise<Finolier[]> {
+  try {
+    const finoliers = await prisma.finoliers.findMany({
+      where: {
+        isPrivate: false,
+      },
+      orderBy: {
+        reputation: "desc",
+      },
+      take: 10,
+    });
+
+    return finoliers;
+  } catch (error: unknown) {
+    console.error("Error fetching non-private finoliers:", error);
+    return [];
+  }
+}

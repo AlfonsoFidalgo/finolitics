@@ -147,3 +147,51 @@ export async function fetchThreadDetails(id: string) {
     };
   }
 }
+
+interface Post {
+  id: string;
+  finolierId: string;
+  createdAt: Date;
+  threadId: string;
+  message: string;
+  likes: number;
+  dislikes: number;
+}
+
+export async function fetchFinolierPosts(
+  finolierId: string,
+  limit: number = 25
+): Promise<Post[]> {
+  const url = `https://disqus.com/api/3.0/users/listPosts?user=username%3A${finolierId}&api_key=${process.env.DISQUS_API}&limit=${limit}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) {
+    return [];
+  }
+  const data = await res.json();
+  const posts = data.response.map(
+    (post: {
+      id: string;
+      createdAt: string;
+      thread: string;
+      raw_message: string;
+      likes: number;
+      dislikes: number;
+    }) => {
+      return {
+        id: post.id,
+        finolierId,
+        createdAt: new Date(post.createdAt),
+        threadId: post.thread,
+        message: post.raw_message,
+        likes: post.likes,
+        dislikes: post.dislikes,
+      };
+    }
+  );
+  return posts;
+}
