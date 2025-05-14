@@ -1,12 +1,17 @@
 import Image from "next/image";
 import FinolierVote from "@/components/finolierVote";
+import LatestPosts from "@/components/latestPosts";
 import { fetchFinolierDetails } from "@/actions/disqus";
+import { fetchLatestPosts, fetchThreads } from "@/actions/utils";
 
 type Params = Promise<{ finolierId: string }>;
 
 export default async function FinolierPage({ params }: { params: Params }) {
   const { finolierId } = await params;
   const finolierDetails = await fetchFinolierDetails(finolierId);
+  const latestPosts = await fetchLatestPosts(finolierId);
+  const threads = await fetchThreads();
+
   if (!finolierDetails.success) {
     return (
       <h1 className="text-3xl font-bold text-center mt-8">
@@ -44,6 +49,7 @@ export default async function FinolierPage({ params }: { params: Params }) {
         Reputación: {finolier.reputation.toFixed(2)}
       </h2>
       <FinolierVote finolierId={finolierId} />
+      <LatestPosts latestPosts={latestPosts} threads={threads} />
     </div>
   );
 }
