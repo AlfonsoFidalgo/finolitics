@@ -94,3 +94,56 @@ export async function fetchFinolierDetails(
     finolier: finolierData,
   };
 }
+
+interface Thread {
+  id: string;
+  title: string;
+  link: string;
+}
+
+export async function fetchThreadDetails(id: string) {
+  const url = `https://disqus.com/api/3.0/threads/details?thread=${id}&api_key=${process.env.DISQUS_API}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) {
+    return {
+      success: false,
+      message: "Thread no encontrado",
+      thread: {} as Thread,
+    };
+  }
+  const data = await res.json();
+  const threadData = {
+    id: data.response.id,
+    title: data.response.clean_title,
+    link: data.response.link,
+  };
+
+  try {
+    const existingThread = await prisma.threads.findUnique({
+      where: { id: threadData.id },
+    });
+
+    if (!existingThread) {
+      await prisma.threads.create({
+        data: { ...threadData },
+      });
+      return {
+        success: true,
+        message: "Thread details fetched successfully",
+        thread: threadData,
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching thread:", error);
+    return {
+      success: false,
+      message: "Error storing the thread",
+      thread: {} as Thread,
+    };
+  }
+}
