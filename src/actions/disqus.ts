@@ -180,22 +180,23 @@ export async function fetchFinolierPosts(
       raw_message: string;
       likes: number;
       dislikes: number;
-      parent: number | "null";
+      parent: number | null;
     }[];
   } = await res.json();
 
-  const posts = data.response.map((post) => {
-    return {
-      id: post.id,
-      finolierId,
-      createdAt: new Date(post.createdAt),
-      threadId: post.thread,
-      message: post.raw_message,
-      likes: post.likes,
-      dislikes: post.dislikes,
-      parent: post.parent,
-    };
-  });
-  const filteredPosts = posts.filter((post) => post.parent === "null");
-  return filteredPosts;
+  const posts = data.response
+    .filter((post) => !post.parent)
+    .map((post) => {
+      return {
+        id: post.id,
+        finolierId,
+        createdAt: new Date(post.createdAt),
+        threadId: post.thread,
+        message: post.raw_message,
+        likes: post.likes,
+        dislikes: post.dislikes,
+      };
+    });
+
+  return posts;
 }
