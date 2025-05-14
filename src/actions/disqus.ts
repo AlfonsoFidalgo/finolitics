@@ -95,7 +95,7 @@ export async function fetchFinolierDetails(
   };
 }
 
-interface Thread {
+export interface Thread {
   id: string;
   title: string;
   link: string;
@@ -148,7 +148,7 @@ export async function fetchThreadDetails(id: string) {
   }
 }
 
-interface Post {
+export interface Post {
   id: string;
   finolierId: string;
   createdAt: Date;
