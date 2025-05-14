@@ -1,4 +1,12 @@
 import { headers } from "next/headers";
+
+import {
+  fetchThreadDetails,
+  fetchFinolierPosts,
+  type Post,
+  type Thread,
+} from "@/actions/disqus";
+import { fetchNonPrivateFinoliers } from "@/actions/utils";
 import prisma from "@/db";
 
 export async function GET() {
@@ -14,45 +22,92 @@ export async function GET() {
     });
   }
 
-  const url = `https://disqus.com/api/3.0/threads/details?thread=10538477384&api_key=${process.env.DISQUS_API}`;
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) {
-    return new Response(JSON.stringify({ error: "Failed to fetch data" }), {
-      status: 500,
+  const finolierList = await fetchNonPrivateFinoliers();
+  if (finolierList.length === 0) {
+    return new Response(JSON.stringify({ error: "No finoliers found" }), {
+      status: 404,
       headers: {
         "Content-Type": "application/json",
       },
     });
   }
-  const data = await res.json();
+  let finolierPosts = [] as Post[];
+  for (const finolier of finolierList) {
+    const posts = await fetchFinolierPosts(finolier.id);
+    if (posts.length === 0) {
+      continue;
+    }
+    finolierPosts = [...finolierPosts, ...posts];
+  }
 
-  const threadPayload = {
-    id: data.response.id,
-    title: data.response.clean_title,
-    link: data.response.link,
-  };
+  const uniqueThreads = new Set<string>();
+  finolierPosts.forEach((post) => {
+    uniqueThreads.add(post.threadId);
+  });
 
-  try {
-    await prisma.threads.create({
-      data: threadPayload,
-    });
-    return new Response(JSON.stringify({ message: "All good" }), {
+  const threadDetails = [] as Thread[];
+  for (const threadId of uniqueThreads) {
+    const thread = await fetchThreadDetails(threadId);
+    if (thread) {
+      threadDetails.push(thread.thread);
+    }
+  }
+
+  for (const thread of threadDetails) {
+    try {
+      const existingThread = await prisma.threads.findUnique({
+        where: { id: thread.id },
+      });
+      if (!existingThread) {
+        await prisma.threads.create({
+          data: { ...thread },
+        });
+      }
+    } catch (error) {
+      console.error("Error saving thread:", error);
+      return new Response(JSON.stringify({ error: "Error saving thread" }), {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+  }
+
+  for (const post of finolierPosts) {
+    try {
+      const existingPost = await prisma.posts.findUnique({
+        where: { id: post.id },
+      });
+      if (!existingPost) {
+        await prisma.posts.create({
+          data: { ...post },
+        });
+      } else {
+        await prisma.posts.update({
+          where: { id: post.id },
+          data: { ...post },
+        });
+      }
+    } catch (error) {
+      console.error("Error saving post:", error);
+      return new Response(JSON.stringify({ error: "Error saving post" }), {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+  }
+  return new Response(
+    JSON.stringify({
+      message: "Finolier posts and threads updated successfully",
+    }),
+    {
       status: 200,
       headers: {
         "Content-Type": "application/json",
       },
-    });
-  } catch (error) {
-    return new Response(JSON.stringify({ error }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
+    }
+  );
 }
