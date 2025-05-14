@@ -172,38 +172,30 @@ export async function fetchFinolierPosts(
   if (!res.ok) {
     return [];
   }
-  const data = await res.json();
-  const posts = data.response.map(
-    (post: {
+  const data: {
+    response: {
       id: string;
       createdAt: string;
       thread: string;
       raw_message: string;
       likes: number;
       dislikes: number;
-      parent: string | null;
-    }) => {
-      return {
-        id: post.id,
-        finolierId,
-        createdAt: new Date(post.createdAt),
-        threadId: post.thread,
-        message: post.raw_message,
-        likes: post.likes,
-        dislikes: post.dislikes,
-        parent: post.parent,
-      };
-    }
-  );
-  return posts.filter(
-    (post: {
-      id: string;
-      createdAt: string;
-      thread: string;
-      raw_message: string;
-      likes: number;
-      dislikes: number;
-      parent: string | null;
-    }) => post.parent === null
-  );
+      parent: number | null;
+    }[];
+  } = await res.json();
+
+  const posts = data.response.map((post) => {
+    return {
+      id: post.id,
+      finolierId,
+      createdAt: new Date(post.createdAt),
+      threadId: post.thread,
+      message: post.raw_message,
+      likes: post.likes,
+      dislikes: post.dislikes,
+      parent: post.parent,
+    };
+  });
+  const filteredPosts = posts.filter((post) => !post.parent);
+  return filteredPosts;
 }
