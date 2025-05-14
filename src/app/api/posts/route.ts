@@ -1,9 +1,6 @@
 import { headers } from "next/headers";
 import prisma from "@/db";
 
-// export const config = {
-//   schedule: "* * * * *",
-// };
 
 export async function GET() {
   const headersList = await headers();
