@@ -181,7 +181,11 @@ export async function fetchFinolierPosts(
       raw_message: string;
       likes: number;
       dislikes: number;
+      parent: string | null;
     }) => {
+      if (post.parent) {
+        return null;
+      }
       return {
         id: post.id,
         finolierId,
