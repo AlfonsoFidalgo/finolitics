@@ -180,7 +180,7 @@ export async function fetchFinolierPosts(
       raw_message: string;
       likes: number;
       dislikes: number;
-      parent: number | null;
+      parent: number | "null";
     }[];
   } = await res.json();
 
@@ -196,6 +196,6 @@ export async function fetchFinolierPosts(
       parent: post.parent,
     };
   });
-  const filteredPosts = posts.filter((post) => !post.parent);
+  const filteredPosts = posts.filter((post) => post.parent === "null");
   return filteredPosts;
 }
