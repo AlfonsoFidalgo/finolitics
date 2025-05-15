@@ -1,6 +1,11 @@
 import { headers } from "next/headers";
 
-import { fetchAllThreads, fetchFinolierPosts } from "@/actions/disqus";
+import {
+  fetchAllThreads,
+  fetchThreadDetails,
+  fetchFinolierPosts,
+  Thread,
+} from "@/actions/disqus";
 import { fetchNonPrivateFinoliers } from "@/actions/utils";
 import prisma from "@/db";
 
@@ -27,14 +32,14 @@ export async function GET() {
     });
   }
 
-  // Fetch all posts for all finoliers in parallel for efficiency
+  // Fetch all posts for all finoliers in parallel
   const postsResults = await Promise.all(
     finolierList.map((finolier) => fetchFinolierPosts(finolier.id))
   );
   // Flatten the array and filter out empty results
   const finolierPosts = postsResults.flat().filter((post) => post);
 
-  await fetchAllThreads(50);
+  await fetchAllThreads(100);
 
   // Fetch all existing post IDs in one query
   const postIds = finolierPosts.map((post) => post.id);
@@ -47,6 +52,50 @@ export async function GET() {
   const postsToCreate = finolierPosts.filter(
     (post) => !existingIds.has(post.id)
   );
+  const uniqueThreadIds = Array.from(
+    new Set(postsToCreate.map((post) => post.threadId))
+  );
+  const existingThreads = await prisma.threads.findMany({
+    where: { id: { in: uniqueThreadIds } },
+    select: { id: true },
+  });
+  const existingThreadIds = new Set(existingThreads.map((t) => t.id));
+  const missingThreadIds = uniqueThreadIds.filter(
+    (id) => !existingThreadIds.has(id)
+  );
+
+  const threadsToCreate = await Promise.all(
+    missingThreadIds.map((threadId) => fetchThreadDetails(threadId))
+  );
+
+  if (threadsToCreate.length > 0) {
+    const threadsData = threadsToCreate
+      .map(
+        (td) =>
+          td?.thread && {
+            id: td.thread.id,
+            title: td.thread.title,
+            createdAt: td.thread.createdAt,
+            link: td.thread.link,
+          }
+      )
+      .filter(Boolean);
+
+    try {
+      await prisma.threads.createMany({
+        data: threadsData as Thread[],
+      });
+    } catch (error) {
+      console.error("Error storing threads:", error);
+      return new Response(JSON.stringify({ error: "Error storing threads" }), {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+  }
+
   const postsToUpdate = finolierPosts.filter((post) =>
     existingIds.has(post.id)
   );

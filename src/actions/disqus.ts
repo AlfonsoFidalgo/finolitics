@@ -129,6 +129,7 @@ export async function fetchThreadDetails(id: string) {
     id: data.response.id,
     title: data.response.clean_title,
     link: data.response.link,
+    createdAt: new Date(data.response.createdAt),
   };
 
   try {
