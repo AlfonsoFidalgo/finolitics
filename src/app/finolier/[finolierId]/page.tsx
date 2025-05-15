@@ -10,7 +10,10 @@ export default async function FinolierPage({ params }: { params: Params }) {
   const { finolierId } = await params;
   const finolierDetails = await fetchFinolierDetails(finolierId);
   const latestPosts = await fetchLatestPosts(finolierId);
-  const threads = await fetchThreads();
+
+  const threadIds = latestPosts.map((post) => post.threadId);
+  const uniqueThreadIds = [...new Set(threadIds)];
+  const threads = await fetchThreads(uniqueThreadIds);
 
   if (!finolierDetails.success) {
     return (

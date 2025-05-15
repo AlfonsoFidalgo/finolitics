@@ -255,13 +255,14 @@ export async function fetchLatestPosts(finolierId: string): Promise<Post[]> {
   }
 }
 
-export async function fetchThreads(): Promise<Thread[]> {
+export async function fetchThreads(ids: string[]): Promise<Thread[]> {
   try {
     const threads = await prisma.threads.findMany({
-      orderBy: {
-        createdAt: "desc",
+      where: {
+        id: {
+          in: ids,
+        },
       },
-      // take: 5,
     });
 
     return threads;

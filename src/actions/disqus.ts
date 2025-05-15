@@ -160,7 +160,7 @@ export interface Post {
 
 export async function fetchFinolierPosts(
   finolierId: string,
-  limit: number = 25
+  limit: number = 50
 ): Promise<Post[]> {
   const url = `https://disqus.com/api/3.0/users/listPosts?user=username%3A${finolierId}&api_key=${process.env.DISQUS_API}&limit=${limit}`;
   const res = await fetch(url, {
