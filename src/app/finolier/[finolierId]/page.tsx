@@ -1,18 +1,18 @@
 import Image from "next/image";
 import FinolierVote from "@/components/finolierVote";
-import LatestPosts from "@/components/latestPosts";
+import GreatestPosts from "@/components/greatestPosts";
 import PrivateFinolier from "@/components/privateFinolier";
 import { fetchFinolierDetails } from "@/actions/disqus";
-import { fetchLatestPosts, fetchThreads } from "@/actions/utils";
+import { fetchGreatestPosts, fetchThreads } from "@/actions/utils";
 
 type Params = Promise<{ finolierId: string }>;
 
 export default async function FinolierPage({ params }: { params: Params }) {
   const { finolierId } = await params;
   const finolierDetails = await fetchFinolierDetails(finolierId);
-  const latestPosts = await fetchLatestPosts(finolierId);
+  const greatestPosts = await fetchGreatestPosts(finolierId);
 
-  const threadIds = latestPosts.map((post) => post.threadId);
+  const threadIds = greatestPosts.map((post) => post.threadId);
   const uniqueThreadIds = [...new Set(threadIds)];
   const threads = await fetchThreads(uniqueThreadIds);
 
@@ -54,8 +54,8 @@ export default async function FinolierPage({ params }: { params: Params }) {
       </h2>
       <FinolierVote finolierId={finolierId} />
       {!finolier.isPrivate && (
-        <LatestPosts
-          latestPosts={latestPosts}
+        <GreatestPosts
+          latestPosts={greatestPosts}
           threads={threads}
           avatar={finolier.avatar}
         />

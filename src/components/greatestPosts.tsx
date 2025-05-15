@@ -9,7 +9,7 @@ interface LatestPostsProps {
   avatar: string;
 }
 
-export default function LatestPosts({
+export default function GreatestPosts({
   latestPosts,
   threads,
   avatar,

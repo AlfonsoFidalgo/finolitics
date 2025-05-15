@@ -236,7 +236,7 @@ export async function fetchNonPrivateFinoliers(): Promise<Finolier[]> {
   }
 }
 
-export async function fetchLatestPosts(finolierId: string): Promise<Post[]> {
+export async function fetchGreatestPosts(finolierId: string): Promise<Post[]> {
   try {
     const posts = await prisma.posts.findMany({
       where: {
