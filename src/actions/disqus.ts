@@ -99,7 +99,7 @@ export interface Thread {
   id: string;
   title: string;
   link: string;
-  createdAt?: string;
+  createdAt: Date;
 }
 
 interface ResponseThread {
