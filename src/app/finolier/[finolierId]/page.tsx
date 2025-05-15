@@ -1,12 +1,21 @@
 import Image from "next/image";
 import FinolierVote from "@/components/finolierVote";
+import GreatestPosts from "@/components/greatestPosts";
+import PrivateFinolier from "@/components/privateFinolier";
 import { fetchFinolierDetails } from "@/actions/disqus";
+import { fetchGreatestPosts, fetchThreads } from "@/actions/utils";
 
 type Params = Promise<{ finolierId: string }>;
 
 export default async function FinolierPage({ params }: { params: Params }) {
   const { finolierId } = await params;
   const finolierDetails = await fetchFinolierDetails(finolierId);
+  const greatestPosts = await fetchGreatestPosts(finolierId);
+
+  const threadIds = greatestPosts.map((post) => post.threadId);
+  const uniqueThreadIds = [...new Set(threadIds)];
+  const threads = await fetchThreads(uniqueThreadIds);
+
   if (!finolierDetails.success) {
     return (
       <h1 className="text-3xl font-bold text-center mt-8">
@@ -44,6 +53,14 @@ export default async function FinolierPage({ params }: { params: Params }) {
         Reputación: {finolier.reputation.toFixed(2)}
       </h2>
       <FinolierVote finolierId={finolierId} />
+      {!finolier.isPrivate && (
+        <GreatestPosts
+          latestPosts={greatestPosts}
+          threads={threads}
+          avatar={finolier.avatar}
+        />
+      )}
+      {finolier.isPrivate && <PrivateFinolier />}
     </div>
   );
 }

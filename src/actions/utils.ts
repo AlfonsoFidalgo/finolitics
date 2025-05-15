@@ -2,7 +2,7 @@
 
 import prisma from "@/db";
 
-import { type Finolier } from "@/actions/disqus";
+import { Post, Thread, type Finolier } from "@/actions/disqus";
 
 interface EmitVoteFormState {
   success: boolean;
@@ -232,6 +232,42 @@ export async function fetchNonPrivateFinoliers(): Promise<Finolier[]> {
     return finoliers;
   } catch (error: unknown) {
     console.error("Error fetching non-private finoliers:", error);
+    return [];
+  }
+}
+
+export async function fetchGreatestPosts(finolierId: string): Promise<Post[]> {
+  try {
+    const posts = await prisma.posts.findMany({
+      where: {
+        finolierId,
+      },
+      orderBy: {
+        likes: "desc",
+      },
+      take: 10,
+    });
+
+    return posts;
+  } catch (error: unknown) {
+    console.error("Error fetching latest posts:", error);
+    return [];
+  }
+}
+
+export async function fetchThreads(ids: string[]): Promise<Thread[]> {
+  try {
+    const threads = await prisma.threads.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return threads;
+  } catch (error: unknown) {
+    console.error("Error fetching threads:", error);
     return [];
   }
 }
