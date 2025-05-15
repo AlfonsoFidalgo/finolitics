@@ -245,7 +245,7 @@ export async function fetchGreatestPosts(finolierId: string): Promise<Post[]> {
       orderBy: {
         likes: "desc",
       },
-      take: 5,
+      take: 10,
     });
 
     return posts;
