@@ -1,11 +1,6 @@
 import { headers } from "next/headers";
 
-import {
-  fetchThreadDetails,
-  fetchFinolierPosts,
-  type Post,
-  type Thread,
-} from "@/actions/disqus";
+import { fetchAllThreads, fetchFinolierPosts } from "@/actions/disqus";
 import { fetchNonPrivateFinoliers } from "@/actions/utils";
 import prisma from "@/db";
 
@@ -31,74 +26,50 @@ export async function GET() {
       },
     });
   }
-  let finolierPosts = [] as Post[];
-  for (const finolier of finolierList) {
-    const posts = await fetchFinolierPosts(finolier.id);
-    if (posts.length === 0) {
-      continue;
-    }
-    finolierPosts = [...finolierPosts, ...posts];
-  }
 
-  const uniqueThreads = new Set<string>();
-  finolierPosts.forEach((post) => {
-    uniqueThreads.add(post.threadId);
+  // Fetch all posts for all finoliers in parallel for efficiency
+  const postsResults = await Promise.all(
+    finolierList.map((finolier) => fetchFinolierPosts(finolier.id))
+  );
+  // Flatten the array and filter out empty results
+  const finolierPosts = postsResults.flat().filter((post) => post);
+
+  await fetchAllThreads(50);
+
+  // Fetch all existing post IDs in one query
+  const postIds = finolierPosts.map((post) => post.id);
+  const existingPosts = await prisma.posts.findMany({
+    where: { id: { in: postIds } },
+    select: { id: true },
   });
+  const existingIds = new Set(existingPosts.map((p) => p.id));
 
-  const threadDetails = [] as Thread[];
-  for (const threadId of uniqueThreads) {
-    const thread = await fetchThreadDetails(threadId);
-    if (thread) {
-      threadDetails.push(thread.thread);
-    }
+  const postsToCreate = finolierPosts.filter(
+    (post) => !existingIds.has(post.id)
+  );
+  const postsToUpdate = finolierPosts.filter((post) =>
+    existingIds.has(post.id)
+  );
+
+  try {
+    await prisma.$transaction([
+      ...postsToCreate.map((post) =>
+        prisma.posts.create({ data: { ...post } })
+      ),
+      ...postsToUpdate.map((post) =>
+        prisma.posts.update({ where: { id: post.id }, data: { ...post } })
+      ),
+    ]);
+  } catch (error) {
+    console.error("Error saving posts:", error);
+    return new Response(JSON.stringify({ error: "Error saving posts" }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 
-  for (const thread of threadDetails) {
-    try {
-      const existingThread = await prisma.threads.findUnique({
-        where: { id: thread.id },
-      });
-      if (!existingThread) {
-        await prisma.threads.create({
-          data: { ...thread },
-        });
-      }
-    } catch (error) {
-      console.error("Error saving thread:", error);
-      return new Response(JSON.stringify({ error: "Error saving thread" }), {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
-  }
-
-  for (const post of finolierPosts) {
-    try {
-      const existingPost = await prisma.posts.findUnique({
-        where: { id: post.id },
-      });
-      if (!existingPost) {
-        await prisma.posts.create({
-          data: { ...post },
-        });
-      } else {
-        await prisma.posts.update({
-          where: { id: post.id },
-          data: { ...post },
-        });
-      }
-    } catch (error) {
-      console.error("Error saving post:", error);
-      return new Response(JSON.stringify({ error: "Error saving post" }), {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
-  }
   return new Response(
     JSON.stringify({
       message: "Finolier posts and threads updated successfully",

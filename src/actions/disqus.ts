@@ -99,6 +99,14 @@ export interface Thread {
   id: string;
   title: string;
   link: string;
+  createdAt: Date;
+}
+
+interface ResponseThread {
+  id: string;
+  clean_title: string;
+  link: string;
+  createdAt: string;
 }
 
 export async function fetchThreadDetails(id: string) {
@@ -144,6 +152,58 @@ export async function fetchThreadDetails(id: string) {
       success: false,
       message: "Error storing the thread",
       thread: {} as Thread,
+    };
+  }
+}
+
+export async function fetchAllThreads(
+  limit: number = 100,
+  forum: string = "finofilipino-org"
+) {
+  const url = `https://disqus.com/api/3.0/threads/list?api_key=${process.env.DISQUS_API}&forum=${forum}&limit=${limit}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) {
+    return {
+      success: false,
+      message: "Error fetching threads",
+      threads: [] as Thread[],
+    };
+  }
+  const data: { response: ResponseThread[] } = await res.json();
+  const threads = data.response;
+
+  //Get most recent thread from database
+  const mostRecentThread = await prisma.threads.findFirst({
+    orderBy: { createdAt: "desc" },
+  });
+  const mostRecentTime = new Date(mostRecentThread?.createdAt || 0);
+
+  const newerThreads = threads
+    .filter((t) => new Date(t.createdAt!) > mostRecentTime)
+    .map((t) => {
+      return {
+        id: t.id,
+        title: t.clean_title,
+        link: t.link,
+        createdAt: new Date(t.createdAt),
+      };
+    });
+
+  try {
+    await prisma.threads.createMany({
+      data: newerThreads,
+    });
+  } catch (error) {
+    console.error("Error storing threads:", error);
+    return {
+      success: false,
+      message: "Error storing threads",
+      threads: [] as Thread[],
     };
   }
 }
