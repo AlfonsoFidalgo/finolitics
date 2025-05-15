@@ -52,6 +52,8 @@ export async function GET() {
   const postsToCreate = finolierPosts.filter(
     (post) => !existingIds.has(post.id)
   );
+  console.log("Posts to create:", postsToCreate);
+
   const uniqueThreadIds = Array.from(
     new Set(postsToCreate.map((post) => post.threadId))
   );
@@ -63,6 +65,7 @@ export async function GET() {
   const missingThreadIds = uniqueThreadIds.filter(
     (id) => !existingThreadIds.has(id)
   );
+  console.log("Missing thread IDs:", missingThreadIds);
 
   const threadsToCreate = await Promise.all(
     missingThreadIds.map((threadId) => fetchThreadDetails(threadId))
@@ -80,7 +83,7 @@ export async function GET() {
           }
       )
       .filter(Boolean);
-
+    console.log("Threads to create:", threadsData);
     try {
       await prisma.threads.createMany({
         data: threadsData as Thread[],
