@@ -1,6 +1,7 @@
 import Image from "next/image";
 import FinolierVote from "@/components/finolierVote";
 import LatestPosts from "@/components/latestPosts";
+import PrivateFinolier from "@/components/privateFinolier";
 import { fetchFinolierDetails } from "@/actions/disqus";
 import { fetchLatestPosts, fetchThreads } from "@/actions/utils";
 
@@ -52,7 +53,14 @@ export default async function FinolierPage({ params }: { params: Params }) {
         Reputación: {finolier.reputation.toFixed(2)}
       </h2>
       <FinolierVote finolierId={finolierId} />
-      <LatestPosts latestPosts={latestPosts} threads={threads} />
+      {!finolier.isPrivate && (
+        <LatestPosts
+          latestPosts={latestPosts}
+          threads={threads}
+          avatar={finolier.avatar}
+        />
+      )}
+      {finolier.isPrivate && <PrivateFinolier />}
     </div>
   );
 }

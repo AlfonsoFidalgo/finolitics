@@ -1,27 +1,36 @@
-import { type Post, type Thread } from "@/actions/disqus";
 import Link from "next/link";
+import Image from "next/image";
+import { type Post, type Thread } from "@/actions/disqus";
+import { LikeIcon, DislikeIcon } from "@/components/UI/icons";
 
 interface LatestPostsProps {
   latestPosts: Post[];
   threads: Thread[];
+  avatar: string;
 }
 
 export default function LatestPosts({
   latestPosts,
   threads,
+  avatar,
 }: LatestPostsProps) {
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-center mt-8">Grandes éxitos</h1>
-      <div className="flex flex-col items-left gap-4 justify-center mt-2  p-4 sm:w-11/12 md:w-3/4 mx-auto rounded-xl shadow-lg">
+    <div className="w-full">
+      <h1 className="text-3xl font-bold text-center mt-2">Grandes éxitos</h1>
+      <div className="flex flex-col items-left gap-4 justify-center p-4 sm:w-11/12 md:w-3/4 mx-auto rounded-xl">
         {latestPosts.map((post: Post) => (
-          <div key={post.id} className="mb-4">
-            <h2 className="text-md">
+          <div
+            key={post.id}
+            className="mb-4 flex flex-col gap-2 bg-stone-50 p-4 rounded-lg shadow-md"
+          >
+            <h2 className="text-md mb-2">
               <Link
                 href={
                   threads.find((thread: Thread) => thread.id === post.threadId)!
                     .link
                 }
+                className="text-blue-600 hover:underline"
+                target="_blank"
               >
                 {
                   threads.find((thread: Thread) => thread.id === post.threadId)
@@ -29,14 +38,45 @@ export default function LatestPosts({
                 }
               </Link>
             </h2>
-            <p className="text-md italic text-gray-500">{post.message}</p>
-            <p className="text-sm italic text-gray-500">
-              {new Date(post.createdAt).toLocaleDateString()} - {post.likes}{" "}
-              likes
-            </p>
+            <div className="flex items-start gap-2">
+              <Image
+                className="border-2 rounded-full"
+                src={avatar}
+                width={40}
+                height={40}
+                alt="avatar"
+              />
+              <div className="flex flex-col gap-2 w-full">
+                <p className="text-md text-gray-700 wrap-anywhere">
+                  {post.message}
+                </p>
+                <div className="text-sm italic text-gray-500 flex justify-between">
+                  {formatDate(post.createdAt)}
+                  <div className="flex gap-4">
+                    <div>
+                      {post.likes}{" "}
+                      <LikeIcon className="size-4 inline mb-2 fill-gray-500" />{" "}
+                    </div>
+                    <div>
+                      {post.dislikes}{" "}
+                      <DislikeIcon className="size-4 inline mb-2 fill-gray-500" />{" "}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
     </div>
   );
+}
+
+function formatDate(dateString: Date): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
