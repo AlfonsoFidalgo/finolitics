@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { type Post, type Thread } from "@/actions/disqus";
 import { LikeIcon, DislikeIcon } from "@/components/UI/icons";
+import PostMessage from "@/components/postMessage";
 
 interface LatestPostsProps {
   latestPosts: Post[];
@@ -47,9 +48,7 @@ export default function GreatestPosts({
                 alt="avatar"
               />
               <div className="flex flex-col gap-2 w-full">
-                <p className="text-md text-gray-700 wrap-anywhere">
-                  {post.message}
-                </p>
+                <PostMessage message={post.message} />
                 <div className="text-sm italic text-gray-500 flex justify-between">
                   {formatDate(post.createdAt)}
                   <div className="flex gap-4">
