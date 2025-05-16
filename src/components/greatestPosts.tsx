@@ -22,7 +22,7 @@ export default function GreatestPosts({
         {latestPosts.map((post: Post) => (
           <div
             key={post.id}
-            className="mb-4 flex flex-col gap-2 bg-stone-50 p-4 rounded-lg shadow-md"
+            className="mb-4 flex flex-col gap-2 bg-stone-100 p-4 rounded-lg shadow-md"
           >
             <h2 className="text-md mb-2">
               <Link
