@@ -1,10 +1,12 @@
 import { headers } from "next/headers";
 
 import {
-  fetchAllThreads,
-  fetchThreadDetails,
+  fetchLatestThreads,
+  fetchThread,
   fetchFinolierPosts,
-  Thread,
+  storeThreads,
+  type Thread,
+  Post,
 } from "@/actions/disqus";
 import { fetchNonPrivateFinoliers } from "@/actions/utils";
 import prisma from "@/db";
@@ -36,39 +38,22 @@ export async function GET() {
   const postsResults = await Promise.all(
     finolierList.map((finolier) => fetchFinolierPosts(finolier.id))
   );
-  // Flatten the array and filter out empty results
   const finolierPosts = postsResults.flat().filter((post) => post);
 
-  await fetchAllThreads(100);
+  //fetch and store the latest threads
+  const response = await fetchLatestThreads(100);
+  if (response.success && response.threads.length > 0) {
+    await storeThreads(response.threads);
+  }
 
-  // Fetch all existing post IDs in one query
-  const postIds = finolierPosts.map((post) => post.id);
-  const existingPosts = await prisma.posts.findMany({
-    where: { id: { in: postIds } },
-    select: { id: true },
-  });
-  const existingIds = new Set(existingPosts.map((p) => p.id));
+  const { postsToCreate, postsToUpdate } = await getPostsToCreate(
+    finolierPosts
+  );
 
-  const postsToCreate = finolierPosts.filter(
-    (post) => !existingIds.has(post.id)
-  );
-  console.log("Posts to create:", postsToCreate);
-
-  const uniqueThreadIds = Array.from(
-    new Set(postsToCreate.map((post) => post.threadId))
-  );
-  const existingThreads = await prisma.threads.findMany({
-    where: { id: { in: uniqueThreadIds } },
-    select: { id: true },
-  });
-  const existingThreadIds = new Set(existingThreads.map((t) => t.id));
-  const missingThreadIds = uniqueThreadIds.filter(
-    (id) => !existingThreadIds.has(id)
-  );
-  console.log("Missing thread IDs:", missingThreadIds);
+  const missingThreadIds = await getMissingThreadIds(postsToCreate);
 
   const threadsToCreate = await Promise.all(
-    missingThreadIds.map((threadId) => fetchThreadDetails(threadId))
+    missingThreadIds.map((threadId) => fetchThread(threadId))
   );
 
   if (threadsToCreate.length > 0) {
@@ -98,10 +83,6 @@ export async function GET() {
       });
     }
   }
-
-  const postsToUpdate = finolierPosts.filter((post) =>
-    existingIds.has(post.id)
-  );
 
   try {
     await prisma.$transaction([
@@ -133,4 +114,41 @@ export async function GET() {
       },
     }
   );
+}
+
+async function getPostsToCreate(posts: Post[]) {
+  //From a given list of posts fetched from the API,
+  //return the list of posts that are not in the db
+  const postIds = posts.map((post) => post.id);
+  const existingPosts = await prisma.posts.findMany({
+    where: { id: { in: postIds } },
+    select: { id: true },
+  });
+  const existingIds = new Set(existingPosts.map((p) => p.id));
+
+  const postsToCreate = posts.filter((post) => !existingIds.has(post.id));
+
+  const postsToUpdate = posts.filter((post) => existingIds.has(post.id));
+  console.log("Total posts:", posts.length);
+  console.log("Posts to create:", postsToCreate.length);
+  console.log("Posts to update:", postsToUpdate.length);
+  return { postsToCreate, postsToUpdate };
+}
+
+async function getMissingThreadIds(posts: Post[]): Promise<string[]> {
+  //Among a list of posts, get the threads of those posts
+  //that are not in the db
+  const uniqueThreadIds = Array.from(
+    new Set(posts.map((post) => post.threadId))
+  );
+  const existingThreads = await prisma.threads.findMany({
+    where: { id: { in: uniqueThreadIds } },
+    select: { id: true },
+  });
+  const existingThreadIds = new Set(existingThreads.map((t) => t.id));
+  const missingThreadIds = uniqueThreadIds.filter(
+    (id) => !existingThreadIds.has(id)
+  );
+  console.log("Missing threads:", missingThreadIds.length);
+  return missingThreadIds;
 }

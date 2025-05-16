@@ -109,7 +109,9 @@ interface ResponseThread {
   createdAt: string;
 }
 
-export async function fetchThreadDetails(id: string) {
+export async function fetchThread(
+  id: string
+): Promise<{ success: boolean; message: string; thread: Thread }> {
   const url = `https://disqus.com/api/3.0/threads/details?thread=${id}&api_key=${process.env.DISQUS_API}`;
   const res = await fetch(url, {
     method: "GET",
@@ -124,43 +126,25 @@ export async function fetchThreadDetails(id: string) {
       thread: {} as Thread,
     };
   }
-  const data = await res.json();
-  const threadData = {
-    id: data.response.id,
-    title: data.response.clean_title,
-    link: data.response.link,
-    createdAt: new Date(data.response.createdAt),
+  const { response }: { response: ResponseThread } = await res.json();
+  const threadData: Thread = {
+    id: response.id,
+    title: response.clean_title,
+    link: response.link,
+    createdAt: new Date(response.createdAt),
   };
-
-  try {
-    const existingThread = await prisma.threads.findUnique({
-      where: { id: threadData.id },
-    });
-
-    if (!existingThread) {
-      await prisma.threads.create({
-        data: { ...threadData },
-      });
-      return {
-        success: true,
-        message: "Thread details fetched successfully",
-        thread: threadData,
-      };
-    }
-  } catch (error) {
-    console.error("Error fetching thread:", error);
-    return {
-      success: false,
-      message: "Error storing the thread",
-      thread: {} as Thread,
-    };
-  }
+  return { success: true, message: "Thread encontrado", thread: threadData };
 }
 
-export async function fetchAllThreads(
+/*
+Fetches the latest threads from Disqus API
+returns only the ones that are still not in the database
+based on the createdAt date
+*/
+export async function fetchLatestThreads(
   limit: number = 100,
   forum: string = "finofilipino-org"
-) {
+): Promise<{ success: boolean; message: string; threads: Thread[] }> {
   const url = `https://disqus.com/api/3.0/threads/list?api_key=${process.env.DISQUS_API}&forum=${forum}&limit=${limit}`;
   const res = await fetch(url, {
     method: "GET",
@@ -194,11 +178,25 @@ export async function fetchAllThreads(
         createdAt: new Date(t.createdAt),
       };
     });
+  console.log(`fetched ${threads.length}, but storing ${newerThreads.length}`);
+  return {
+    success: true,
+    message: "Threads fetched successfully",
+    threads: newerThreads,
+  };
+}
 
+export async function storeThreads(threads: Thread[]) {
   try {
     await prisma.threads.createMany({
-      data: newerThreads,
+      data: threads,
     });
+    console.log(`Stored ${threads.length} threads`);
+    return {
+      success: true,
+      message: "Threads stored successfully",
+      threads: threads,
+    };
   } catch (error) {
     console.error("Error storing threads:", error);
     return {
