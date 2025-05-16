@@ -18,6 +18,12 @@ export default function Header() {
       </h1>
       <div className="flex gap-8 mx-8">
         <Link
+          href="/buscar"
+          className="sm:text-lg font-semibold hover:text-zinc-700 transition duration-300"
+        >
+          Buscar
+        </Link>
+        <Link
           href="/top-finoliers"
           className="sm:text-lg font-semibold hover:text-zinc-700 transition duration-300"
         >

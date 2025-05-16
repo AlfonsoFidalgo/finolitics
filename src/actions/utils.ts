@@ -255,6 +255,27 @@ export async function fetchGreatestPosts(finolierId: string): Promise<Post[]> {
   }
 }
 
+export async function fetchRecentGreatestPosts(): Promise<Post[]> {
+  try {
+    const posts = await prisma.posts.findMany({
+      where: {
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+        },
+      },
+      orderBy: {
+        likes: "desc",
+      },
+      take: 10,
+    });
+
+    return posts;
+  } catch (error: unknown) {
+    console.error("Error fetching latest posts:", error);
+    return [];
+  }
+}
+
 export async function fetchThreads(ids: string[]): Promise<Thread[]> {
   try {
     const threads = await prisma.threads.findMany({
@@ -268,6 +289,25 @@ export async function fetchThreads(ids: string[]): Promise<Thread[]> {
     return threads;
   } catch (error: unknown) {
     console.error("Error fetching threads:", error);
+    return [];
+  }
+}
+
+export async function fetchFinoliers(
+  finolierIds: string[]
+): Promise<Finolier[]> {
+  try {
+    const finoliers = await prisma.finoliers.findMany({
+      where: {
+        id: {
+          in: finolierIds,
+        },
+      },
+    });
+
+    return finoliers;
+  } catch (error: unknown) {
+    console.error("Error fetching finoliers:", error);
     return [];
   }
 }
