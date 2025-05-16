@@ -167,7 +167,7 @@ export async function fetchLatestThreads(
     orderBy: { createdAt: "desc" },
   });
   const mostRecentTime = new Date(mostRecentThread?.createdAt || 0);
-  console.log(mostRecentTime);
+
   const newerThreads = threads
     .filter((t) => new Date(t.createdAt!) > mostRecentTime)
     .map((t) => {
@@ -178,6 +178,7 @@ export async function fetchLatestThreads(
         createdAt: new Date(t.createdAt),
       };
     });
+  console.log("Newer threads: ", newerThreads);
   console.log(`fetched ${threads.length}, but storing ${newerThreads.length}`);
   return {
     success: true,
