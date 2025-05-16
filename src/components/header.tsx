@@ -10,8 +10,8 @@ export default function Header() {
   useStoreUserId(userId, setUserId);
 
   return (
-    <header className="bg-emerald-300 text-zinc-900 sm:p-4 py-4 flex items-center justify-between w-full">
-      <h1 className="text-xl sm:text-2xl font-bold font-mono tracking-wider uppercase">
+    <header className="bg-emerald-300 text-zinc-900 sm:p-4 py-4 flex items-center justify-between w-full h-24">
+      <h1 className="text-xl sm:text-3xl font-bold font-mono tracking-wider uppercase">
         <Link href="/" className="hover:text-zinc-700 pl-2">
           Finolitics
         </Link>
