@@ -178,6 +178,7 @@ export async function fetchLatestThreads(
         createdAt: new Date(t.createdAt),
       };
     });
+  console.log(mostRecentTime);
   console.log("Newer threads: ", newerThreads);
   console.log(`fetched ${threads.length}, but storing ${newerThreads.length}`);
   return {

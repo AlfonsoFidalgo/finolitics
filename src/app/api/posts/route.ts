@@ -63,7 +63,7 @@ export async function GET() {
           td?.thread && {
             id: td.thread.id,
             title: td.thread.title,
-            createdAt: td.thread.createdAt,
+            createdAt: new Date(td.thread.createdAt),
             link: td.thread.link,
           }
       )
