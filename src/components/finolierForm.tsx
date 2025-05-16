@@ -43,7 +43,7 @@ export default function FinolierForm() {
         <input
           type="text"
           placeholder="Buscar finolier..."
-          className="border border-gray-300 rounded-lg p-4 sm:w-96 w-full"
+          className="border text-center text-lg font-mono tracking-wider border-zinc-300 rounded-lg p-4 sm:w-96 w-full focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 focus:outline-none transition duration-300"
           name="finolier"
           value={finolierId}
           onChange={(e) => setFinolierId(e.target.value)}
@@ -51,7 +51,7 @@ export default function FinolierForm() {
         <button
           type="submit"
           disabled={!finolierId}
-          className="bg-slate-700 text-white rounded-lg p-4 mt-2 sm:w-96 w-full uppercase tracking-wider shadow-2xl hover:bg-slate-800 cursor-pointer transition duration-300 disabled:opacity-50 disabled:cursor-default"
+          className="bg-emerald-400 text-zinc-900 font-bold rounded-lg p-4 mt-2 sm:w-96 w-full uppercase tracking-wider shadow-2xl hover:bg-emerald-600 cursor-pointer transition duration-300 disabled:opacity-50 disabled:cursor-default"
         >
           {isPending ? "Cargando..." : "Buscar"}
         </button>

@@ -13,7 +13,7 @@ export default function Table({
   return (
     <div className="relative overflow-x-auto">
       <table className="w-full text-left rtl:text-right">
-        <thead className="uppercase text-xs sm:text-sm md:text-md bg-lime-600 text-stone-50">
+        <thead className="uppercase text-xs sm:text-sm md:text-md bg-emerald-300 text-zinc-700">
           <tr>
             {columns.map((col) => {
               return (
@@ -29,11 +29,11 @@ export default function Table({
             return (
               <tr
                 key={finolier.id}
-                className="border-b bg-stone-50 border-stone-300 hover:bg-stone-100 cursor-pointer"
+                className="border-b bg-zinc-50 border-zinc-300 hover:bg-zinc-100 cursor-pointer"
               >
                 <th
                   scope="row"
-                  className="font-medium italics text-stone-600 text-xs sm:text-sm whitespace-nowrap py-3 px-0"
+                  className="font-medium italics text-zinc-700 text-xs sm:text-sm whitespace-nowrap py-3 px-0"
                 >
                   <Link href={`/finolier/${finolier.id}`}>
                     <div className="flex flex-col items-center gap-1">

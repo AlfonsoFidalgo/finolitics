@@ -10,16 +10,16 @@ export default function Header() {
   useStoreUserId(userId, setUserId);
 
   return (
-    <header className="bg-lime-800 text-stone-50 sm:p-4 py-4 flex items-center justify-between w-full">
+    <header className="bg-emerald-300 text-zinc-900 sm:p-4 py-4 flex items-center justify-between w-full">
       <h1 className="text-xl sm:text-2xl font-bold font-mono tracking-wider uppercase">
-        <Link href="/" className="hover:text-stone-300 pl-2">
+        <Link href="/" className="hover:text-zinc-700 pl-2">
           Finolitics
         </Link>
       </h1>
       <div className="flex gap-8 mx-8">
         <Link
           href="/top-finoliers"
-          className="sm:text-lg font-semibold hover:text-stone-300 transition duration-300"
+          className="sm:text-lg font-semibold hover:text-zinc-700 transition duration-300"
         >
           Top Finoliers
         </Link>

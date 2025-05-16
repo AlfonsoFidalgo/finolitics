@@ -52,12 +52,10 @@ export default async function FinolierPage({ params }: { params: Params }) {
           {finolier.numFollowers} seguidores, siguiendo a{" "}
           {finolier.numFollowing}
         </h2>
-        <h2>
-          Reputación: {finolier.reputation.toFixed(2)}
-        </h2>
+        <h2>Reputación: {finolier.reputation.toFixed(2)}</h2>
         <FinolierVote finolierId={finolierId} />
       </div>
-      {!finolier.isPrivate && greatestPosts.length > 0 && (
+      {!finolier.isPrivate && (
         <GreatestPosts
           latestPosts={greatestPosts}
           threads={threads}
