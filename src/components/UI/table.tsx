@@ -12,8 +12,8 @@ export default function Table({
   //   console.log(data);
   return (
     <div className="relative overflow-x-auto">
-      <table className="w-full text-sm text-left rtl:text-right text-gray-400">
-        <thead className="text-md  uppercase bg-gray-700 text-white">
+      <table className="w-full text-xs sm:text-sm text-left rtl:text-right">
+        <thead className="text-md  uppercase bg-lime-600 text-stone-50">
           <tr>
             {columns.map((col) => {
               return (
@@ -29,11 +29,11 @@ export default function Table({
             return (
               <tr
                 key={finolier.id}
-                className="border-b bg-gray-800 border-gray-700 hover:bg-gray-600 cursor-pointer"
+                className="border-b bg-stone-50 border-stone-300 hover:bg-lime-50 cursor-pointer"
               >
                 <th
                   scope="row"
-                  className="px-2 py-4 font-medium whitespace-nowrap text-white"
+                  className="font-medium whitespace-nowrap py-3 px-0"
                 >
                   <Link href={`/finolier/${finolier.id}`}>
                     <div className="flex flex-col items-center gap-1">
@@ -48,17 +48,17 @@ export default function Table({
                     </div>
                   </Link>
                 </th>
-                <td className="px-2 py-4 text-center whitespace-nowrap text-white">
+                <td className="text-center whitespace-nowrap py-3 px-0">
                   <Link href={`/finolier/${finolier.id}`}>
                     {finolier.reputation.toFixed(2)}
                   </Link>
                 </td>
-                <td className="px-2 py-4 text-center whitespace-nowrap text-white">
+                <td className="text-center whitespace-nowrap py-3 px-0">
                   <Link href={`/finolier/${finolier.id}`}>
                     {new Intl.NumberFormat().format(finolier.numPosts)}
                   </Link>
                 </td>
-                <td className="px-2 py-4 text-center whitespace-nowrap text-white">
+                <td className="text-center whitespace-nowrap py-3 px-0">
                   <Link href={`/finolier/${finolier.id}`}>
                     {(finolier.numLikesReceived / finolier.numPosts).toFixed(2)}
                   </Link>
