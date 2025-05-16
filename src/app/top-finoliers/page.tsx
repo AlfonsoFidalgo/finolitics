@@ -7,8 +7,8 @@ export default async function Home() {
 
   return (
     <>
-      <div className="my-6 sm:my-10 w-full sm:w-8/12 mx-auto">
-        <h1 className="text-center text-2xl font-semibold mb-4">
+      <div className="my-6 sm:my-10 w-9/12 sm:w-8/12 mx-auto">
+        <h1 className="text-center text-xl sm:text-2xl font-semibold mb-6">
           Top 10 Finoliers más populares
         </h1>
         <Table

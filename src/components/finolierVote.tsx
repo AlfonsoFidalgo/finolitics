@@ -43,14 +43,14 @@ export default function FinolierVote({ finolierId }: { finolierId: string }) {
           <VoteButton
             label="Me cae bien"
             value="like"
-            style={`bg-green-600 hover:bg-green-700 ${
+            style={`text-zinc-700 bg-emerald-400 hover:bg-emerald-500 ${
               !userId ? "opacity-50 cursor-not-allowed" : ""
             } ${vote === "like" ? "underline font-bold" : ""}`}
           />
           <VoteButton
             label="No sé quién es"
             value="unknown"
-            style={`bg-gray-600 hover:bg-gray-700 ${
+            style={`bg-zinc-600 hover:bg-zinc-700 ${
               !userId ? "opacity-50 cursor-not-allowed" : ""
             } ${vote === "unknown" ? "underline font-bold" : ""}`}
           />

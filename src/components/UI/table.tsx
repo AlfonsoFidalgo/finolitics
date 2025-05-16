@@ -12,8 +12,8 @@ export default function Table({
   //   console.log(data);
   return (
     <div className="relative overflow-x-auto">
-      <table className="w-full text-sm text-left rtl:text-right text-gray-400">
-        <thead className="text-md  uppercase bg-gray-700 text-white">
+      <table className="w-full text-left rtl:text-right">
+        <thead className="uppercase text-xs sm:text-sm md:text-md bg-emerald-300 text-zinc-700">
           <tr>
             {columns.map((col) => {
               return (
@@ -24,16 +24,16 @@ export default function Table({
             })}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-xs sm:text-sm md:text-lg">
           {data.map((finolier: Finolier) => {
             return (
               <tr
                 key={finolier.id}
-                className="border-b bg-gray-800 border-gray-700 hover:bg-gray-600 cursor-pointer"
+                className="border-b bg-zinc-50 border-zinc-300 hover:bg-zinc-100 cursor-pointer"
               >
                 <th
                   scope="row"
-                  className="px-2 py-4 font-medium whitespace-nowrap text-white"
+                  className="font-medium italics text-zinc-700 text-xs sm:text-sm whitespace-nowrap py-3 px-0"
                 >
                   <Link href={`/finolier/${finolier.id}`}>
                     <div className="flex flex-col items-center gap-1">
@@ -48,17 +48,17 @@ export default function Table({
                     </div>
                   </Link>
                 </th>
-                <td className="px-2 py-4 text-center whitespace-nowrap text-white">
+                <td className="text-center whitespace-nowrap py-3 px-0 ">
                   <Link href={`/finolier/${finolier.id}`}>
                     {finolier.reputation.toFixed(2)}
                   </Link>
                 </td>
-                <td className="px-2 py-4 text-center whitespace-nowrap text-white">
+                <td className="text-center whitespace-nowrap py-3 px-0 ">
                   <Link href={`/finolier/${finolier.id}`}>
                     {new Intl.NumberFormat().format(finolier.numPosts)}
                   </Link>
                 </td>
-                <td className="px-2 py-4 text-center whitespace-nowrap text-white">
+                <td className="text-center whitespace-nowrap py-3 px-0 ">
                   <Link href={`/finolier/${finolier.id}`}>
                     {(finolier.numLikesReceived / finolier.numPosts).toFixed(2)}
                   </Link>
