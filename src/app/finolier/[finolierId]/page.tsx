@@ -43,7 +43,7 @@ export default async function FinolierPage({ params }: { params: Params }) {
               {finolier.about}. {finolier.location}
             </h2>
           ))}
-        <hr className="w-9/12 my-4 text-stone-400" />
+        <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto"/>
         <h2>
           {new Intl.NumberFormat().format(finolier.numPosts)} comentarios,{" "}
           {new Intl.NumberFormat().format(finolier.numLikesReceived)} upvotes.

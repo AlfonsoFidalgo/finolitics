@@ -29,7 +29,7 @@ export default function FinolierForm() {
       <h1 className="text-3xl text-zinc-700">
         Busca a un finolier con su usuario de Disqus
       </h1>
-      <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto"/>
+      <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto" />
       <form
         className="flex flex-col items-center justify-start  gap-2 mb-8"
         action={action}
@@ -57,14 +57,16 @@ export default function FinolierForm() {
           {isPending ? "Cargando..." : "Hazte con todos"}
         </button>
       </form>
-      <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto"/>
       {formState.success === false && (
-        <div className="mx-auto mt-4 w-1/2">
-          <p className="text-red-500 text-md font-semibold mt-2 text-center">
-            Finolier no encontrado. Asegúrate de usar el id de Disqus, no el
-            nombre de usuario.
-          </p>
-        </div>
+        <>
+          <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto" />
+          <div className="mx-auto mt-4 w-1/2">
+            <p className="text-red-500 text-md font-semibold mt-2 text-center">
+              Finolier no encontrado. Asegúrate de usar el id de Disqus, no el
+              nombre de usuario.
+            </p>
+          </div>
+        </>
       )}
     </div>
   );
