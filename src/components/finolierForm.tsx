@@ -25,14 +25,15 @@ export default function FinolierForm() {
   }, [formState, router]);
 
   return (
-    <div className="text-center w-11/12 md:w-3/4 mx-auto p-2">
+    <div className="text-center w-11/12 md:w-6/12 mx-auto p-4 bg-zinc-50 rounded-lg shadow-md">
+      <h1 className="text-3xl text-zinc-700">
+        Busca a un finolier con su usuario de Disqus
+      </h1>
+      <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto"/>
       <form
-        className="flex flex-col items-center justify-start mt-8"
+        className="flex flex-col items-center justify-start  gap-2 mb-8"
         action={action}
       >
-        <label className="text-lg font-semibold mb-2 sm:w-96 w-full">
-          Busca a un finolier con su usuario de Disqus
-        </label>
         <Image
           src="/disqusId.png"
           alt="Disqus ID"
@@ -53,9 +54,10 @@ export default function FinolierForm() {
           disabled={!finolierId}
           className="bg-emerald-400 text-zinc-900 font-bold rounded-lg p-4 mt-2 sm:w-96 w-full uppercase tracking-wider shadow-2xl hover:bg-emerald-600 cursor-pointer transition duration-300 disabled:opacity-50 disabled:cursor-default"
         >
-          {isPending ? "Cargando..." : "Buscar"}
+          {isPending ? "Cargando..." : "Hazte con todos"}
         </button>
       </form>
+      <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto"/>
       {formState.success === false && (
         <div className="mx-auto mt-4 w-1/2">
           <p className="text-red-500 text-md font-semibold mt-2 text-center">
