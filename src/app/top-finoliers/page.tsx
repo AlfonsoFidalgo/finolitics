@@ -1,5 +1,5 @@
 // export const revalidate = 60;
-import { fetchTopUpvoted } from "@/actions/utils";
+import { fetchTopUpvoted } from "@/actions/finoliers";
 import Table from "@/components/UI/table";
 
 export default async function Home() {

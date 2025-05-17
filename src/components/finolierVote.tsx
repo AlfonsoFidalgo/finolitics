@@ -4,7 +4,7 @@ import { useState, useEffect, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useUserContext } from "@/contexts/userContext";
 import Chart from "@/components/UI/pieChart";
-import { emitVote } from "@/actions/utils";
+import { emitVote } from "@/actions/votes";
 import useSummaryVotes from "@/hooks/useSummaryVotes";
 
 export default function FinolierVote({ finolierId }: { finolierId: string }) {

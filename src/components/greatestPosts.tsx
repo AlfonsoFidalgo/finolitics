@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { type Post, type Thread } from "@/actions/disqus";
+import { type Thread } from "@/actions/threads";
+import { type Post } from "@/actions/posts";
 import { LikeIcon, DislikeIcon } from "@/components/UI/icons";
 import PostMessage from "@/components/postMessage";
 
@@ -18,7 +19,11 @@ export default function GreatestPosts({
   return (
     <div className="w-full">
       <h1 className="text-3xl font-bold text-center mt-2">Grandes éxitos</h1>
-      {latestPosts.length === 0 && (<p className="text-center py-4 text-lg text-zinc-600">Vuelve más tarde para ver los mejores comentarion de este especimen.</p>)}
+      {latestPosts.length === 0 && (
+        <p className="text-center py-4 text-lg text-zinc-600">
+          Vuelve más tarde para ver los mejores comentarion de este especimen.
+        </p>
+      )}
       <div className="flex flex-col items-left gap-4 justify-center p-4 sm:w-11/12 md:w-3/4 mx-auto rounded-xl">
         {latestPosts.map((post: Post) => (
           <div
