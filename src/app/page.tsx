@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import {
   fetchRecentGreatestPosts,
   fetchThreads,
@@ -21,7 +23,7 @@ export default async function FinolierSearch() {
         Tu sitio de confianza para saber más sobre tus finoliers favoritos,
         darles cariño y poder perder aún más el tiempo.
       </h1>
-      <div className="flex flex-col items-center justify-center mt-4 w-11/12 sm:w-8/12 gap-4">
+      <div className="flex flex-col items-center justify-center mt-4 w-11/12 sm:w-8/12">
         <GreatestRecentPosts
           latestPosts={recentPosts}
           threads={threads}

@@ -20,8 +20,8 @@ export default function GreatestRecentPosts({
       <h1 className="text-3xl text-zinc-700 text-center mt-4">
         Últimos comentarios destacados
       </h1>
-      <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto"/>
-      <div className="flex flex-col items-left gap-4 justify-center p-4 sm:w-11/12 md:w-3/4 mx-auto rounded-xl">
+      <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto" />
+      <div className="flex flex-col items-left gap-2 justify-center p-4 sm:w-11/12 md:w-3/4 mx-auto rounded-xl">
         {latestPosts.map((post: Post) => {
           const finolier = finoliers.find((fn) => fn.id === post.finolierId);
           return (
