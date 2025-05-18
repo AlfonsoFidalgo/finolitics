@@ -1,16 +1,6 @@
 import { headers } from "next/headers";
 
-import {
-  type Thread,
-  storeAndUpdatePosts,
-  fetchFinolierPosts,
-  getPostsToCreate,
-  storeThreads,
-  fetchThread,
-  fetchLatestThreads,
-  getMissingThreadIds,
-  fetchNonPrivateFinoliers,
-} from "@/actions";
+import { fetchNonPrivateFinoliers, updateFinoliersPosts } from "@/actions";
 
 export async function GET() {
   const headersList = await headers();
@@ -35,64 +25,17 @@ export async function GET() {
     });
   }
 
-  // Fetch all posts for all finoliers in parallel
-  const postsResults = await Promise.all(
-    finolierList.map((finolier) => fetchFinolierPosts(finolier.id))
-  );
-  const finolierPosts = postsResults.flat().filter((post) => post);
-
-  //fetch and store the latest threads
-  const response = await fetchLatestThreads(100);
-  if (response.success && response.threads.length > 0) {
-    await storeThreads(response.threads);
+  const finolierIds = finolierList.map((finolier) => finolier.id);
+  const res = await updateFinoliersPosts(finolierIds);
+  if (!res || !res.success) {
+    return new Response(JSON.stringify({ error: "Error updating posts" }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 
-  const { postsToCreate, postsToUpdate } = await getPostsToCreate(
-    finolierPosts
-  );
-
-  const missingThreadIds = await getMissingThreadIds(postsToCreate);
-
-  const threadsToCreate = await Promise.all(
-    missingThreadIds.map((threadId) => fetchThread(threadId))
-  );
-
-  if (threadsToCreate.length > 0) {
-    const threadsData = threadsToCreate
-      .map(
-        (td) =>
-          td?.thread && {
-            id: td.thread.id,
-            title: td.thread.title,
-            createdAt: new Date(td.thread.createdAt),
-            link: td.thread.link,
-          }
-      )
-      .filter(Boolean);
-    console.log("Threads to create:", threadsData);
-    const { success } = await storeThreads(threadsData as Thread[]);
-    if (!success) {
-      return new Response(JSON.stringify({ error: "Error storing threads" }), {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
-  }
-
-  const { success } = await storeAndUpdatePosts(postsToCreate, postsToUpdate);
-  if (!success) {
-    return new Response(
-      JSON.stringify({ error: "Error saving and updating posts" }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  }
   return new Response(
     JSON.stringify({
       message: "Finolier posts and threads updated successfully",
