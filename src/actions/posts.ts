@@ -1,6 +1,13 @@
 "use server";
 
 import prisma from "@/db";
+import {
+  fetchLatestThreads,
+  fetchThread,
+  getMissingThreadIds,
+  storeThreads,
+  Thread,
+} from "@/actions";
 
 export interface Post {
   id: string;
@@ -140,4 +147,58 @@ export async function fetchRecentGreatestPostsDB(): Promise<Post[]> {
     console.error("Error fetching latest posts:", error);
     return [];
   }
+}
+
+export async function updateFinoliersPosts(finolierIds: string[]) {
+  // Fetch all posts for all finoliers in parallel
+  const postsResults = await Promise.all(
+    finolierIds.map((id) => fetchFinolierPosts(id))
+  );
+  const finolierPosts = postsResults.flat().filter((post) => post);
+  //fetch and store the latest threads
+  const response = await fetchLatestThreads(100);
+  if (response.success && response.threads.length > 0) {
+    await storeThreads(response.threads);
+  }
+
+  const { postsToCreate, postsToUpdate } = await getPostsToCreate(
+    finolierPosts
+  );
+  const missingThreadIds = await getMissingThreadIds(postsToCreate);
+  const threadsToCreate = await Promise.all(
+    missingThreadIds.map((threadId) => fetchThread(threadId))
+  );
+
+  if (threadsToCreate.length > 0) {
+    const threadsData = threadsToCreate
+      .map(
+        (td) =>
+          td?.thread && {
+            id: td.thread.id,
+            title: td.thread.title,
+            createdAt: new Date(td.thread.createdAt),
+            link: td.thread.link,
+          }
+      )
+      .filter(Boolean);
+    const { success } = await storeThreads(threadsData as Thread[]);
+    if (!success) {
+      return {
+        success: false,
+        message: "Error storing threads",
+      };
+    }
+  }
+
+  const { success } = await storeAndUpdatePosts(postsToCreate, postsToUpdate);
+  if (!success) {
+    return {
+      success: false,
+      message: "Error storing posts",
+    };
+  }
+  return {
+    success: true,
+    message: "Posts updated successfully",
+  };
 }
