@@ -100,7 +100,9 @@ export async function getPostsToCreate(posts: Post[]) {
   return { postsToCreate, postsToUpdate };
 }
 
-export async function fetchGreatestPostsDB(finolierId: string): Promise<Post[]> {
+export async function fetchGreatestPostsDB(
+  finolierId: string
+): Promise<Post[]> {
   try {
     const posts = await prisma.posts.findMany({
       where: {
