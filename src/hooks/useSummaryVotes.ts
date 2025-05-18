@@ -1,6 +1,6 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
-import { fetchUserVote, fetchFinolierVotes } from "@/actions/utils";
+import { fetchUserVote, fetchFinolierVotes } from "@/actions";
 
 export default function useSummaryVotes(
   finolierId: string,

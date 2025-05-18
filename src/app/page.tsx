@@ -1,18 +1,18 @@
 export const revalidate = 3600;
 
 import {
-  fetchRecentGreatestPosts,
-  fetchThreads,
   fetchFinoliers,
-} from "@/actions/utils";
+  fetchThreadsDB,
+  fetchRecentGreatestPostsDB,
+} from "@/actions";
 
 import GreatestRecentPosts from "@/components/greatestRecentPosts";
 
 export default async function FinolierSearch() {
-  const recentPosts = await fetchRecentGreatestPosts();
+  const recentPosts = await fetchRecentGreatestPostsDB();
   const threadIds = recentPosts.map((post) => post.threadId);
   const uniqueThreadIds = [...new Set(threadIds)];
-  const threads = await fetchThreads(uniqueThreadIds);
+  const threads = await fetchThreadsDB(uniqueThreadIds);
   const finolierIds = recentPosts.map((post) => post.finolierId);
   const uniqueFinolierIds = [...new Set(finolierIds)];
   const finoliers = await fetchFinoliers(uniqueFinolierIds);

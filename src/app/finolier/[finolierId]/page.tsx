@@ -2,19 +2,22 @@ import Image from "next/image";
 import FinolierVote from "@/components/finolierVote";
 import GreatestPosts from "@/components/greatestPosts";
 import PrivateFinolier from "@/components/privateFinolier";
-import { fetchFinolierDetails } from "@/actions/disqus";
-import { fetchGreatestPosts, fetchThreads } from "@/actions/utils";
+import {
+  fetchFinolierDetails,
+  fetchGreatestPostsDB,
+  fetchThreadsDB,
+} from "@/actions";
 
 type Params = Promise<{ finolierId: string }>;
 
 export default async function FinolierPage({ params }: { params: Params }) {
   const { finolierId } = await params;
   const finolierDetails = await fetchFinolierDetails(finolierId);
-  const greatestPosts = await fetchGreatestPosts(finolierId);
+  const greatestPosts = await fetchGreatestPostsDB(finolierId);
 
   const threadIds = greatestPosts.map((post) => post.threadId);
   const uniqueThreadIds = [...new Set(threadIds)];
-  const threads = await fetchThreads(uniqueThreadIds);
+  const threads = await fetchThreadsDB(uniqueThreadIds);
 
   if (!finolierDetails.success) {
     return (
@@ -43,7 +46,7 @@ export default async function FinolierPage({ params }: { params: Params }) {
               {finolier.about}. {finolier.location}
             </h2>
           ))}
-        <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto"/>
+        <hr className="text-emerald-400 my-5 w-11/12 max-w-150 mx-auto" />
         <h2>
           {new Intl.NumberFormat().format(finolier.numPosts)} comentarios,{" "}
           {new Intl.NumberFormat().format(finolier.numLikesReceived)} upvotes.

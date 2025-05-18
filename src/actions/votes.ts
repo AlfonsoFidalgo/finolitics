@@ -1,0 +1,130 @@
+"use server";
+
+import prisma from "@/db";
+
+interface EmitVoteFormState {
+  success: boolean;
+  message: string;
+  vote: "like" | "dislike" | "unknown" | undefined;
+}
+
+type Vote = "like" | "dislike" | "unknown" | undefined;
+
+export async function emitVote(
+  currState: EmitVoteFormState,
+  formData: FormData
+): Promise<EmitVoteFormState> {
+  const userId = formData.get("userId") as string | null;
+  const finolierId = formData.get("finolierId") as string;
+  const vote = formData.get("vote") as Vote;
+  const currentVote = formData.get("currentVote") as Vote;
+
+  if (!userId || !finolierId || !vote) {
+    return {
+      success: false,
+      message: "Información incompleta",
+      vote: currentVote,
+    };
+  }
+
+  try {
+    if (!currentVote) {
+      const newVote = await prisma.votes.create({
+        data: {
+          userId,
+          finolierId,
+          vote,
+        },
+      });
+
+      return {
+        success: true,
+        message: "Voto emitido correctamente",
+        vote: newVote.vote,
+      };
+    } else if (vote === currentVote) {
+      return {
+        success: true,
+        message: "Voto no cambiado",
+        vote: currentVote,
+      };
+    } else {
+      const updatedVote = await prisma.votes.update({
+        where: {
+          userId_finolierId: {
+            userId,
+            finolierId,
+          },
+        },
+        data: {
+          vote,
+        },
+      });
+
+      return {
+        success: true,
+        message: "Voto actualizado correctamente",
+        vote: updatedVote.vote,
+      };
+    }
+  } catch (error: unknown) {
+    console.error("Error al emitir el voto:", error);
+    return {
+      success: false,
+      message: "Error al emitir el voto",
+      vote: currentVote,
+    };
+  }
+}
+
+export async function fetchUserVote(
+  finolierId: string,
+  userId: string
+): Promise<"like" | "dislike" | "unknown" | undefined> {
+  try {
+    const vote = await prisma.votes.findUnique({
+      where: {
+        userId_finolierId: {
+          userId,
+          finolierId,
+        },
+      },
+    });
+    return vote?.vote;
+  } catch (error: unknown) {
+    console.error("Error fetching votes:", error);
+    return undefined;
+  }
+}
+
+export async function fetchFinolierVotes(finolierId: string): Promise<{
+  like: number;
+  dislike: number;
+  unknown: number;
+} | null> {
+  try {
+    const votes = await prisma.votes.findMany({
+      where: {
+        finolierId,
+      },
+    });
+    const summaryVotes = {
+      like: 0,
+      dislike: 0,
+      unknown: 0,
+    };
+    votes.forEach((vote) => {
+      if (vote.vote === "like") {
+        summaryVotes.like++;
+      } else if (vote.vote === "dislike") {
+        summaryVotes.dislike++;
+      } else if (vote.vote === "unknown") {
+        summaryVotes.unknown++;
+      }
+    });
+    return summaryVotes;
+  } catch (error: unknown) {
+    console.error("Error fetching votes:", error);
+    return null;
+  }
+}
