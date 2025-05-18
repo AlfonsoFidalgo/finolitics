@@ -3,14 +3,14 @@
 import { useState, useEffect, useActionState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { fetchFinolierDetails, type Finolier } from "@/actions";
+import { addOrUpdateFinolier, type Finolier } from "@/actions";
 
 export default function FinolierForm() {
   const router = useRouter();
   const [finolierId, setFinolierId] = useState("");
 
   const [formState, action, isPending] = useActionState(
-    fetchFinolierDetails.bind(null, finolierId),
+    addOrUpdateFinolier.bind(null, finolierId),
     { success: null, message: "", finolier: {} as Finolier }
   );
 

@@ -27,13 +27,7 @@ interface FinolierFormState {
   finolier: Finolier;
 }
 
-// export async function fetchFinoliers(): Promise<Finolier[]> {
-//   return await prisma.finoliers.findMany();
-// }
-
-export async function fetchFinolierDetails(
-  id: string
-): Promise<FinolierFormState> {
+async function fetchFinolier(id: string) {
   const sanitizedId = id[0] === "@" ? id.slice(1) : id;
   const url = `https://disqus.com/api/3.0/users/details?user=username%3A${sanitizedId}&api_key=${process.env.DISQUS_API}`;
   const res = await fetch(url, {
@@ -49,24 +43,38 @@ export async function fetchFinolierDetails(
       finolier: {} as Finolier,
     };
   }
-  const data = await res.json();
+  const { response } = await res.json();
   const finolierData = {
     id: sanitizedId,
-    displayName: data.response.name,
-    avatar: data.response.avatar?.permalink,
-    about: data.response.about,
-    location: data.response.location,
-    numFollowers: data.response.numFollowers,
-    numFollowing: data.response.numFollowing,
-    numPosts: data.response.numPosts,
-    reputation: data.response.reputation,
-    numLikesReceived: data.response.numLikesReceived,
-    isPrivate: data.response.isPrivate,
+    displayName: response.name,
+    avatar: response.avatar?.permalink,
+    about: response.about,
+    location: response.location,
+    numFollowers: response.numFollowers,
+    numFollowing: response.numFollowing,
+    numPosts: response.numPosts,
+    reputation: response.reputation,
+    numLikesReceived: response.numLikesReceived,
+    isPrivate: response.isPrivate,
   };
+  return { success: true, message: "Finolier fetched", finolier: finolierData };
+}
 
+export async function addOrUpdateFinolier(
+  id: string
+): Promise<FinolierFormState> {
+  const finolierData = await fetchFinolier(id);
+  if (!finolierData.success) {
+    return {
+      success: false,
+      message: finolierData.message,
+      finolier: {} as Finolier,
+    };
+  }
+  const { finolier } = finolierData;
   // check if finolier already exists in the database
   const existingFinolier = await prisma.finoliers.findUnique({
-    where: { id: finolierData.id },
+    where: { id: finolier.id },
   });
 
   if (existingFinolier) {
@@ -75,23 +83,23 @@ export async function fetchFinolierDetails(
     if (updatedAt < hoursAgo24) {
       console.log("Updating finolier data");
       await prisma.finoliers.update({
-        where: { id: finolierData.id },
-        data: { ...finolierData },
+        where: { id: finolier.id },
+        data: { ...finolier },
       });
     }
     return {
       success: true,
       message: "Finolier details updated successfully",
-      finolier: finolierData,
+      finolier,
     };
   }
 
-  await prisma.finoliers.create({ data: { ...finolierData } });
+  await prisma.finoliers.create({ data: { ...finolier } });
   revalidatePath("/top-finoliers");
   return {
     success: true,
     message: "Finolier details fetched successfully",
-    finolier: finolierData,
+    finolier,
   };
 }
 

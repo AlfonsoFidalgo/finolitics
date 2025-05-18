@@ -3,7 +3,7 @@ import FinolierVote from "@/components/finolierVote";
 import GreatestPosts from "@/components/greatestPosts";
 import PrivateFinolier from "@/components/privateFinolier";
 import {
-  fetchFinolierDetails,
+  addOrUpdateFinolier,
   fetchGreatestPostsDB,
   fetchThreadsDB,
 } from "@/actions";
@@ -12,7 +12,7 @@ type Params = Promise<{ finolierId: string }>;
 
 export default async function FinolierPage({ params }: { params: Params }) {
   const { finolierId } = await params;
-  const finolierDetails = await fetchFinolierDetails(finolierId);
+  const finolierDetails = await addOrUpdateFinolier(finolierId);
   const greatestPosts = await fetchGreatestPostsDB(finolierId);
 
   const threadIds = greatestPosts.map((post) => post.threadId);
