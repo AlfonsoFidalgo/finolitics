@@ -155,6 +155,12 @@ export async function updateFinoliersPosts(finolierIds: string[]) {
     finolierIds.map((id) => fetchFinolierPosts(id))
   );
   const finolierPosts = postsResults.flat().filter((post) => post);
+  if (finolierPosts.length === 0) {
+    return {
+      success: true,
+      message: "No posts to update",
+    };
+  }
   //fetch and store the latest threads
   const response = await fetchLatestThreads(100);
   if (response.success && response.threads.length > 0) {
