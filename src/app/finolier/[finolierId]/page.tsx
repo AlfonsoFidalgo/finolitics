@@ -14,13 +14,12 @@ type Params = Promise<{ finolierId: string }>;
 export default async function FinolierPage({ params }: { params: Params }) {
   const { finolierId } = await params;
   const finolierDetails = await addOrUpdateFinolier(finolierId);
+  await updateFinoliersPosts([finolierId]);
   const greatestPosts = await fetchGreatestPostsDB(finolierId);
 
   const threadIds = greatestPosts.map((post) => post.threadId);
   const uniqueThreadIds = [...new Set(threadIds)];
   const threads = await fetchThreadsDB(uniqueThreadIds);
-
-  await updateFinoliersPosts([finolierId]);
 
   if (!finolierDetails.success) {
     return (
