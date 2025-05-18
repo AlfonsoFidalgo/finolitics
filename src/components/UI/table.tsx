@@ -1,4 +1,4 @@
-import { type Finolier } from "@/actions/finoliers";
+import { type Finolier } from "@/actions";
 import Image from "next/image";
 import Link from "next/link";
 

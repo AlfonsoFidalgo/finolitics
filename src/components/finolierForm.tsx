@@ -3,7 +3,7 @@
 import { useState, useEffect, useActionState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { fetchFinolierDetails, type Finolier } from "@/actions/finoliers";
+import { fetchFinolierDetails, type Finolier } from "@/actions";
 
 export default function FinolierForm() {
   const router = useRouter();

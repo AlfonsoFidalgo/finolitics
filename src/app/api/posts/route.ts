@@ -1,18 +1,16 @@
 import { headers } from "next/headers";
 
 import {
+  type Thread,
   storeAndUpdatePosts,
   fetchFinolierPosts,
   getPostsToCreate,
-} from "@/actions/posts";
-import {
-  type Thread,
   storeThreads,
   fetchThread,
   fetchLatestThreads,
   getMissingThreadIds,
-} from "@/actions/threads";
-import { fetchNonPrivateFinoliers } from "@/actions/finoliers";
+  fetchNonPrivateFinoliers,
+} from "@/actions";
 
 export async function GET() {
   const headersList = await headers();

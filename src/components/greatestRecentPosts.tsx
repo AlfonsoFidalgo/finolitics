@@ -1,8 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { type Finolier } from "@/actions/finoliers";
-import { type Post } from "@/actions/posts";
-import { type Thread } from "@/actions/threads";
+import { type Finolier, type Post, type Thread } from "@/actions";
 import { LikeIcon, DislikeIcon } from "@/components/UI/icons";
 import PostMessage from "@/components/postMessage";
 

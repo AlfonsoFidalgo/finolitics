@@ -1,5 +1,5 @@
 import { type Dispatch, type SetStateAction, useEffect } from "react";
-import { saveUser, isUserInDB } from "@/actions/users";
+import { saveUser, isUserInDB } from "@/actions";
 
 function generateUserId() {
   return `${Math.random().toString(36).slice(2)}`;

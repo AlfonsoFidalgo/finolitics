@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/db";
-import { Post } from "@/actions/posts";
+import { Post } from "@/actions";
 
 export interface Thread {
   id: string;

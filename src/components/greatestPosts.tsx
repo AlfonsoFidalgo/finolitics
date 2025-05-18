@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { type Thread } from "@/actions/threads";
-import { type Post } from "@/actions/posts";
+import { type Thread, type Post } from "@/actions";
 import { LikeIcon, DislikeIcon } from "@/components/UI/icons";
 import PostMessage from "@/components/postMessage";
 

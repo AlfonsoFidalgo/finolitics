@@ -1,8 +1,10 @@
 export const revalidate = 3600;
 
-import { fetchFinoliers } from "@/actions/finoliers";
-import { fetchThreadsDB } from "@/actions/threads";
-import { fetchRecentGreatestPostsDB } from "@/actions/posts";
+import {
+  fetchFinoliers,
+  fetchThreadsDB,
+  fetchRecentGreatestPostsDB,
+} from "@/actions";
 
 import GreatestRecentPosts from "@/components/greatestRecentPosts";
 

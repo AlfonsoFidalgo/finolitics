@@ -2,9 +2,11 @@ import Image from "next/image";
 import FinolierVote from "@/components/finolierVote";
 import GreatestPosts from "@/components/greatestPosts";
 import PrivateFinolier from "@/components/privateFinolier";
-import { fetchFinolierDetails } from "@/actions/finoliers";
-import { fetchGreatestPostsDB } from "@/actions/posts";
-import { fetchThreadsDB } from "@/actions/threads";
+import {
+  fetchFinolierDetails,
+  fetchGreatestPostsDB,
+  fetchThreadsDB,
+} from "@/actions";
 
 type Params = Promise<{ finolierId: string }>;
 
