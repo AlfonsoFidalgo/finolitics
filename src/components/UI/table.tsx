@@ -6,10 +6,9 @@ export default function Table({
   data,
   columns,
 }: {
-  data: Finolier[];
+  data: (Finolier & { count: number; likes: number })[];
   columns: string[];
 }) {
-  //   console.log(data);
   return (
     <div className="relative overflow-x-auto">
       <table className="w-full text-left rtl:text-right">
@@ -25,7 +24,7 @@ export default function Table({
           </tr>
         </thead>
         <tbody className="text-xs sm:text-sm md:text-lg">
-          {data.map((finolier: Finolier) => {
+          {data.map((finolier) => {
             return (
               <tr
                 key={finolier.id}
@@ -50,17 +49,17 @@ export default function Table({
                 </th>
                 <td className="text-center whitespace-nowrap py-3 px-0 ">
                   <Link href={`/finolier/${finolier.id}`}>
+                    {new Intl.NumberFormat().format(finolier.count)}
+                  </Link>
+                </td>
+                <td className="text-center whitespace-nowrap py-3 px-0 ">
+                  <Link href={`/finolier/${finolier.id}`}>
+                    {finolier.likes}
+                  </Link>
+                </td>
+                <td className="text-center whitespace-nowrap py-3 px-0 ">
+                  <Link href={`/finolier/${finolier.id}`}>
                     {finolier.reputation.toFixed(2)}
-                  </Link>
-                </td>
-                <td className="text-center whitespace-nowrap py-3 px-0 ">
-                  <Link href={`/finolier/${finolier.id}`}>
-                    {new Intl.NumberFormat().format(finolier.numPosts)}
-                  </Link>
-                </td>
-                <td className="text-center whitespace-nowrap py-3 px-0 ">
-                  <Link href={`/finolier/${finolier.id}`}>
-                    {(finolier.numLikesReceived / finolier.numPosts).toFixed(2)}
                   </Link>
                 </td>
               </tr>

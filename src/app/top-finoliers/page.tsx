@@ -1,19 +1,19 @@
 // export const revalidate = 60;
-import { fetchTopUpvoted } from "@/actions";
+import { fetchMostActiveLast7Days } from "@/actions";
 import Table from "@/components/UI/table";
 
 export default async function Home() {
-  const topUpvoted = await fetchTopUpvoted();
+  const mostActive = await fetchMostActiveLast7Days();
 
   return (
     <>
       <div className="my-6 sm:my-10 w-9/12 sm:w-8/12 mx-auto">
-        <h1 className="text-center text-xl sm:text-2xl font-semibold mb-6">
-          Top 10 Finoliers más populares
+        <h1 className="text-center text-xl sm:text-3xl font-semibold mb-2 sm:mb-6">
+          Finoliers más activos de la semana
         </h1>
         <Table
-          data={topUpvoted}
-          columns={["Finolier", "Reputación", "Comentarios", "Ratio Upvotes"]}
+          data={mostActive}
+          columns={["Finolier", "Comentarios", "Upvotes", "Reputación"]}
         />
       </div>
     </>

@@ -1,5 +1,6 @@
 "use server";
 
+import { subDays } from "date-fns";
 import prisma from "@/db";
 import { revalidatePath } from "next/cache";
 
@@ -135,6 +136,58 @@ export async function fetchTopComentators(): Promise<Finolier[]> {
     console.error("Error fetching top comentators finoliers:", error);
     return [];
   }
+}
+
+export async function fetchMostActiveLast7Days(): Promise<
+  (Finolier & { count: number; likes: number })[]
+> {
+  const sevenDaysAgo = subDays(new Date(), 7);
+
+  const mostActive = await prisma.posts.groupBy({
+    by: ["finolierId"],
+    where: {
+      createdAt: {
+        gte: sevenDaysAgo,
+      },
+    },
+    cacheStrategy: { ttl: 3600 },
+    _count: {
+      _all: true,
+    },
+    _sum: {
+      likes: true,
+      // dislikes: true,
+    },
+    orderBy: {
+      _count: {
+        id: "desc",
+      },
+    },
+    take: 10,
+  });
+
+  const finoliers = await prisma.finoliers.findMany({
+    where: { id: { in: mostActive.map((item) => item.finolierId) } },
+    cacheStrategy: { ttl: 3600 },
+  });
+
+  return mostActive
+    .map((item) => {
+      const finolier = finoliers.find((f) => f.id === item.finolierId);
+      return finolier
+        ? {
+            ...finolier,
+            count: item._count._all,
+            likes: item._sum.likes ?? 0,
+            // dislikes: item._sum.dislikes ?? 0,
+          }
+        : null;
+    })
+    .filter(Boolean) as (Finolier & {
+    count: number;
+    likes: number;
+    // dislikes: number;
+  })[];
 }
 
 export async function fetchTopUpvoted(): Promise<Finolier[]> {
