@@ -33,6 +33,10 @@ export default function RootLayout({
         <UserContextProvider>
           <Header />
           {children}
+          <p className="my-6 text-center text-zinc-700 w-3/4 mx-auto">
+            Los datos no se actualizan en tiempo real. Si ves que algo no
+            cuadra, vuelve en un rato
+          </p>
           <Analytics />
         </UserContextProvider>
       </body>
