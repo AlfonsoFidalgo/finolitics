@@ -115,6 +115,7 @@ export async function fetchGreatestPostsDB(
       where: {
         finolierId,
       },
+      cacheStrategy: { ttl: 3600 },
       orderBy: {
         likes: "desc",
       },
@@ -136,6 +137,7 @@ export async function fetchRecentGreatestPostsDB(): Promise<Post[]> {
           gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
         },
       },
+      cacheStrategy: { ttl: 3600 },
       orderBy: {
         likes: "desc",
       },
