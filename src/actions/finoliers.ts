@@ -109,6 +109,7 @@ export async function fetchTopReputationFinoliers(): Promise<Finolier[]> {
       orderBy: {
         reputation: "desc",
       },
+      cacheStrategy: { ttl: 3600 },
       take: 5,
     });
 
@@ -125,6 +126,7 @@ export async function fetchTopComentators(): Promise<Finolier[]> {
       orderBy: {
         numPosts: "desc",
       },
+      cacheStrategy: { ttl: 3600 },
       take: 5,
     });
 
@@ -141,6 +143,7 @@ export async function fetchTopUpvoted(): Promise<Finolier[]> {
       orderBy: {
         numLikesReceived: "desc",
       },
+      cacheStrategy: { ttl: 3600 },
       take: 10,
     });
 
@@ -157,6 +160,7 @@ export async function fetchNonPrivateFinoliers(): Promise<Finolier[]> {
       where: {
         isPrivate: false,
       },
+      cacheStrategy: { ttl: 3600 },
       orderBy: {
         reputation: "desc",
       },
