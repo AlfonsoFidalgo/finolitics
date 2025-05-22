@@ -151,7 +151,6 @@ export async function fetchRecentGreatestPostsDB(): Promise<Post[]> {
   }
 }
 
-
 export async function updateFinoliersPosts(finolierIds: string[]) {
   // Find all finoliers and their lastPostsUpdate
   const finoliers = await prisma.finoliers.findMany({
@@ -162,6 +161,7 @@ export async function updateFinoliersPosts(finolierIds: string[]) {
       id: true,
       lastPostsUpdate: true,
     },
+    cacheStrategy: { ttl: 3600 },
   });
   const now = new Date();
   // Filter finoliers that have not been updated in the last 12 hours
