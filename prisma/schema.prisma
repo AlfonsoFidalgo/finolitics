@@ -14,7 +14,7 @@ datasource db {
 // https://dbdiagram.io/d/finoliers-681790d11ca52373f56487b3
 
 model Finoliers {
-  id               String   @id
+  id               String    @id
   displayName      String
   avatar           String
   about            String
@@ -25,8 +25,9 @@ model Finoliers {
   numPosts         Int
   reputation       Float
   numLikesReceived Int
-  updatedAt        DateTime @updatedAt
-  createdAt        DateTime @default(now())
+  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime  @default(now())
+  lastPostsUpdate  DateTime?
   votes            Votes[]
   tags             Tags[]
   Posts            Posts[]
