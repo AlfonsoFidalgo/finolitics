@@ -151,10 +151,38 @@ export async function fetchRecentGreatestPostsDB(): Promise<Post[]> {
   }
 }
 
+
 export async function updateFinoliersPosts(finolierIds: string[]) {
-  // Fetch all posts for all finoliers in parallel
+  // Find all finoliers and their lastPostsUpdate
+  const finoliers = await prisma.finoliers.findMany({
+    where: {
+      id: { in: finolierIds },
+    },
+    select: {
+      id: true,
+      lastPostsUpdate: true,
+    },
+  });
+  const now = new Date();
+  // Filter finoliers that have not been updated in the last 12 hours
+  const finoliersToUpdate = finoliers.filter((finolier) => {
+    if (!finolier.lastPostsUpdate) return true;
+    const diff = Math.abs(
+      now.getTime() - new Date(finolier.lastPostsUpdate).getTime()
+    );
+    const diffHours = Math.ceil(diff / (1000 * 60 * 60));
+    return diffHours >= 12;
+  });
+  if (finoliersToUpdate.length === 0) {
+    return {
+      success: true,
+      message: "All finolier posts already updated in the last 12 hours",
+    };
+  }
+  const idsToUpdate = finoliersToUpdate.map((f) => f.id);
+  // Fetch all posts for finoliers to update in parallel
   const postsResults = await Promise.all(
-    finolierIds.map((id) => fetchFinolierPosts(id))
+    idsToUpdate.map((id) => fetchFinolierPosts(id))
   );
   const finolierPosts = postsResults.flat().filter((post) => post);
   if (finolierPosts.length === 0) {
@@ -205,6 +233,16 @@ export async function updateFinoliersPosts(finolierIds: string[]) {
       message: "Error storing posts",
     };
   }
+  // Update the lastPostsUpdate field for updated finoliers only
+  await prisma.finoliers.updateMany({
+    where: {
+      id: { in: idsToUpdate },
+    },
+    data: {
+      lastPostsUpdate: new Date(),
+    },
+  });
+
   return {
     success: true,
     message: "Posts updated successfully",
