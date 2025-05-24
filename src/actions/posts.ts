@@ -116,8 +116,14 @@ export async function getPostsToCreate(posts: Post[]) {
 
   const postsToUpdate = posts.filter((post) => existingIds.has(post.id));
   console.log("Total posts:", posts.length);
-  console.log("Posts to create:", postsToCreate.length);
-  console.log("Posts to update:", postsToUpdate.length);
+  console.log(
+    "Posts to create:",
+    postsToCreate.map((p) => p.id)
+  );
+  console.log(
+    "Posts to update:",
+    postsToUpdate.map((p) => p.id)
+  );
   return { postsToCreate, postsToUpdate };
 }
 
