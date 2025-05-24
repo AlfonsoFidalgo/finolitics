@@ -28,10 +28,15 @@ export async function storeAndUpdatePosts(
   try {
     await prisma.$transaction([
       ...postsToCreate.map((post) =>
-        prisma.posts.create({ data: { ...post } })
+        prisma.posts.create({
+          data: { ...post, popularity: post.likes + post.dislikes },
+        })
       ),
       ...postsToUpdate.map((post) =>
-        prisma.posts.update({ where: { id: post.id }, data: { ...post } })
+        prisma.posts.update({
+          where: { id: post.id },
+          data: { ...post, popularity: post.likes + post.dislikes },
+        })
       ),
     ]);
     return {
@@ -117,7 +122,7 @@ export async function fetchGreatestPostsDB(
       },
       cacheStrategy: { ttl: 3600 },
       orderBy: {
-        likes: "desc",
+        popularity: "desc",
       },
       take: 10,
     });
@@ -139,7 +144,7 @@ export async function fetchRecentGreatestPostsDB(): Promise<Post[]> {
       },
       cacheStrategy: { ttl: 3600 },
       orderBy: {
-        likes: "desc",
+        popularity: "desc",
       },
       take: 10,
     });
