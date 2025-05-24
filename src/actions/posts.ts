@@ -32,12 +32,12 @@ export async function storeAndUpdatePosts(
           data: { ...post, popularity: post.likes + post.dislikes },
         })
       ),
-      // ...postsToUpdate.map((post) =>
-      //   prisma.posts.update({
-      //     where: { id: post.id },
-      //     data: { ...post, popularity: post.likes + post.dislikes },
-      //   })
-      // ),
+      ...postsToUpdate.map((post) =>
+        prisma.posts.update({
+          where: { id: post.id },
+          data: { ...post, popularity: post.likes + post.dislikes },
+        })
+      ),
     ]);
     return {
       success: true,
