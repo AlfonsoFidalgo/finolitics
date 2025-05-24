@@ -82,6 +82,7 @@ model Posts {
   message    String
   likes      Int       @default(0)
   dislikes   Int       @default(0)
+  popularity Int       @default(0)
   // parent     Posts?    @relation("PostToPost", fields: [parentId], references: [id])
   // parentId   String?
   // children   Posts[]   @relation("PostToPost")
