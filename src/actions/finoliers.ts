@@ -217,7 +217,7 @@ export async function fetchNonPrivateFinoliers(): Promise<Finolier[]> {
       orderBy: {
         reputation: "desc",
       },
-      take: 50,
+      take: 5,
     });
 
     return finoliers;
