@@ -166,7 +166,7 @@ export async function updateFinoliersPosts(finolierIds: string[]) {
       id: true,
       lastPostsUpdate: true,
     },
-    cacheStrategy: { ttl: 3600 },
+    // cacheStrategy: { ttl: 3600 },
   });
   const now = new Date();
   // Filter finoliers that have not been updated in the last 12 hours
