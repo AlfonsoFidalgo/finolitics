@@ -163,7 +163,7 @@ export async function fetchMostActiveLast7Days(): Promise<
         id: "desc",
       },
     },
-    take: 10,
+    take: 25,
   });
 
   const finoliers = await prisma.finoliers.findMany({
