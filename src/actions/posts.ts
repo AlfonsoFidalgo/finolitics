@@ -161,7 +161,7 @@ export async function fetchRecentGreatestPostsDB(): Promise<Post[]> {
       orderBy: {
         popularity: "desc",
       },
-      take: 10,
+      take: 25,
     });
 
     return posts;
@@ -206,10 +206,13 @@ export async function updateFinoliersPosts(finolierIds: string[]) {
   );
   const finolierPosts = Array.from(
     new Map(
-      postsResults.flat().filter((post) => post).map((post) => [post.id, post])
+      postsResults
+        .flat()
+        .filter((post) => post)
+        .map((post) => [post.id, post])
     ).values()
   );
-  
+
   if (finolierPosts.length === 0) {
     return {
       success: true,
