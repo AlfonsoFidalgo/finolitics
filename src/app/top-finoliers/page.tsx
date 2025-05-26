@@ -9,7 +9,7 @@ export default async function Home() {
     <>
       <div className="my-6 sm:my-10 w-9/12 sm:w-8/12 mx-auto">
         <h1 className="text-center text-xl sm:text-3xl font-semibold mb-2 sm:mb-6">
-          Finoliers más activos de la semana
+          Finoliers más activos en los últimos días
         </h1>
         <Table
           data={mostActive}
