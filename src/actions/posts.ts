@@ -204,7 +204,12 @@ export async function updateFinoliersPosts(finolierIds: string[]) {
   const postsResults = await Promise.all(
     idsToUpdate.map((id) => fetchFinolierPosts(id))
   );
-  const finolierPosts = postsResults.flat().filter((post) => post);
+  const finolierPosts = Array.from(
+    new Map(
+      postsResults.flat().filter((post) => post).map((post) => [post.id, post])
+    ).values()
+  );
+  
   if (finolierPosts.length === 0) {
     return {
       success: true,
