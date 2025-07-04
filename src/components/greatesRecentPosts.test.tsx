@@ -1,13 +1,11 @@
-import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import GreatesRecentPosts from "@/components/greatestRecentPosts";
-// import "@testing-library/jest-dom";
 
 describe("GreatesRecentPosts", () => {
   it("renders correctly", () => {
     render(<GreatesRecentPosts latestPosts={[]} threads={[]} finoliers={[]} />);
     const title = screen.getByText("Últimos comentarios destacados");
-    expect(title).toBeDefined();
+    expect(title).toBeInTheDocument();
   });
 
   it("renders posts correctly", () => {
@@ -56,7 +54,7 @@ describe("GreatesRecentPosts", () => {
     );
     screen.debug(); // This will log the rendered output to the console
     const post1 = screen.getByText("This is a test post");
-    expect(post1).toBeDefined();
+    expect(post1).toBeInTheDocument();
   });
 });
 
