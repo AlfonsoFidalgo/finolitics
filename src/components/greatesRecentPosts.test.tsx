@@ -52,15 +52,8 @@ describe("GreatesRecentPosts", () => {
         finoliers={[]}
       />
     );
-    screen.debug(); // This will log the rendered output to the console
     const post1 = screen.getByText("This is a test post");
     expect(post1).toBeInTheDocument();
   });
 });
 
-export interface Thread {
-  id: string;
-  title: string;
-  link: string;
-  createdAt: Date;
-}
