@@ -1,10 +1,11 @@
 import { it, describe, expect, vi, beforeEach } from "vitest";
-import { fetchFinolierVotes } from "./votes";
+import { fetchFinolierVotes, fetchUserVote } from "./votes";
 import prisma from "@/db";
 vi.mock("@/db", () => ({
   default: {
     votes: {
       findMany: vi.fn(),
+      findUnique: vi.fn(),
     },
   },
 }));
@@ -102,5 +103,68 @@ describe("fetchFinolierVotes", () => {
     const votes = await fetchFinolierVotes(finolierId);
 
     expect(votes).toBeNull();
+  });
+});
+
+describe("fetchUserVote", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+  it("fetches votes given a userId and finolierId", async () => {
+    const finolierId = "finolier1";
+    const userId = "userId1";
+    const userVote = "like";
+
+    const mockedVote = {
+      userId,
+      finolierId,
+      vote: userVote,
+      id: "1234",
+      createdAt: new Date(),
+    };
+    vi.mocked(prisma.votes.findUnique).mockResolvedValue(mockedVote);
+
+    const vote = await fetchUserVote(finolierId, userId);
+    expect(vote).toBe(userVote);
+  });
+
+  it("returns undefined if no vote", async () => {
+    const finolierId = "finolier1";
+    const userId = "userId1";
+
+    const mockedVote = null;
+    vi.mocked(prisma.votes.findUnique).mockResolvedValue(mockedVote);
+
+    const vote = await fetchUserVote(finolierId, userId);
+    expect(vote).not.toBeDefined();
+  });
+
+  it("returns undefined when database throws an error", async () => {
+    const finolierId = "finolier1";
+    const userId = "userId1";
+
+    vi.mocked(prisma.votes.findUnique).mockRejectedValue(
+      new Error("Database error")
+    );
+    const vote = await fetchUserVote(finolierId, userId);
+
+    expect(vote).not.toBeDefined();
+  });
+
+  it("queries the database with the correct userId and finolierId", async () => {
+    const finolierId = "finolier1";
+    const userId = "userId1";
+
+    await fetchUserVote(finolierId, userId);
+    expect(prisma.votes.findUnique).toHaveBeenCalledWith({
+      where: {
+        userId_finolierId: {
+          userId,
+          finolierId,
+        },
+      },
+    });
+
+    expect(prisma.votes.findUnique).toHaveBeenCalledTimes(1);
   });
 });
