@@ -1,11 +1,13 @@
 import { it, describe, expect, vi, beforeEach } from "vitest";
-import { fetchFinolierVotes, fetchUserVote } from "./votes";
+import { fetchFinolierVotes, fetchUserVote, emitVote } from "./votes";
 import prisma from "@/db";
 vi.mock("@/db", () => ({
   default: {
     votes: {
       findMany: vi.fn(),
       findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
     },
   },
 }));
@@ -166,5 +168,131 @@ describe("fetchUserVote", () => {
     });
 
     expect(prisma.votes.findUnique).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("emitVote", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const initialState = {
+    success: false,
+    message: "",
+    vote: undefined,
+  };
+
+  it("returns the right object if form data is missing", async () => {
+    const formData = new FormData();
+
+    const result = await emitVote(initialState, formData);
+
+    expect(result.message).toBe("Información incompleta");
+  });
+
+  it("Creates a new vote if no current vote", async () => {
+    const userId = "user1";
+    const finolierId = "finolier1";
+    const vote = "like";
+
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("finolierId", finolierId);
+    formData.append("vote", vote);
+
+    vi.mocked(prisma.votes.create).mockResolvedValue({
+      userId,
+      finolierId,
+      vote,
+      id: "123",
+      createdAt: new Date(),
+    });
+    const result = await emitVote(initialState, formData);
+    expect(result.message).toBe("Voto emitido correctamente");
+    expect(result.success).toBe(true);
+    expect(result.vote).toBe(vote);
+    expect(prisma.votes.create).toHaveBeenCalledWith({
+      data: {
+        userId,
+        finolierId,
+        vote,
+      },
+    });
+    expect(prisma.votes.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("doesn't store or update the vote if it hasn't changed", async () => {
+    const userId = "user1";
+    const finolierId = "finolier1";
+    const vote = "like";
+
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("finolierId", finolierId);
+    formData.append("vote", vote);
+    formData.append("currentVote", vote);
+
+    const result = await emitVote(initialState, formData);
+    expect(result.message).toBe("Voto no cambiado");
+    expect(prisma.votes.create).not.toHaveBeenCalled();
+    expect(prisma.votes.update).not.toHaveBeenCalled();
+  });
+
+  it("Updates the vote correctly", async () => {
+    const userId = "user1";
+    const finolierId = "finolier1";
+    const vote = "like";
+    const currentVote = "dislike";
+
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("finolierId", finolierId);
+    formData.append("vote", vote);
+    formData.append("currentVote", currentVote);
+
+    vi.mocked(prisma.votes.update).mockResolvedValue({
+      userId,
+      finolierId,
+      vote,
+      id: "123",
+      createdAt: new Date(),
+    });
+    const result = await emitVote(initialState, formData);
+
+    expect(result.message).toBe("Voto actualizado correctamente");
+    expect(result.success).toBe(true);
+    expect(result.vote).toBe(vote);
+
+    expect(prisma.votes.update).toHaveBeenCalledTimes(1);
+    expect(prisma.votes.update).toHaveBeenCalledWith({
+      where: {
+        userId_finolierId: {
+          userId,
+          finolierId,
+        },
+      },
+      data: {
+        vote,
+      },
+    });
+  });
+
+  it("Returns error response if database error", async () => {
+    const userId = "user1";
+    const finolierId = "finolier1";
+    const vote = "like";
+
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("finolierId", finolierId);
+    formData.append("vote", vote);
+
+    vi.mocked(prisma.votes.create).mockRejectedValue(
+      new Error("Database error")
+    );
+    const result = await emitVote(initialState, formData);
+
+    expect(result.message).toBe("Error al emitir el voto");
+    expect(result.success).toBe(false);
   });
 });
