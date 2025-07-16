@@ -41,12 +41,12 @@ describe("fetchThread", () => {
       createdAt: new Date(),
     };
 
-    const testFetch = vi.fn((url, options) => {
-      return new Promise((resolve, reject) => {
+    const testFetch = vi.fn(() => {
+      return new Promise((resolve) => {
         const testResponse = {
           ok: true,
           json() {
-            return new Promise((response, reject) => {
+            return new Promise((response) => {
               response({
                 response: responseThread,
               });
@@ -60,7 +60,6 @@ describe("fetchThread", () => {
 
     const result = await fetchThread("123");
 
-    console.log(result);
     expect(testFetch).toHaveBeenCalledWith(
       expect.stringContaining("thread=123"),
       expect.objectContaining({
@@ -69,6 +68,7 @@ describe("fetchThread", () => {
       })
     );
     expect(result.success).toBe(true);
+    expect(result.message).toBe("Thread encontrado");
     expect(result.thread).toEqual({
       id: responseThread.id,
       title: responseThread.clean_title,
