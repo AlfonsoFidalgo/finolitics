@@ -4,6 +4,7 @@ import {
   fetchThread,
   fetchThreadsDB,
   fetchLatestThreads,
+  getMissingThreadIds,
   type Thread,
 } from "./threads";
 import prisma from "@/db";
@@ -172,5 +173,52 @@ describe("fetchLatestThreads", () => {
     // One thread should be filtered out
     expect(result.threads).toHaveLength(1);
     expect(result.threads[0]).toMatchObject({ id: "123" });
+  });
+});
+
+describe("getMissingThreadIds", () => {
+  const mockedPosts = [
+    {
+      id: "123",
+      finolierId: "abc",
+      createdAt: new Date(),
+      threadId: "thread-1",
+      message: "test message 1",
+      likes: 1,
+      dislikes: 0,
+    },
+    {
+      id: "456",
+      finolierId: "abc",
+      createdAt: new Date(),
+      threadId: "thread-1",
+      message: "test message 1",
+      likes: 1,
+      dislikes: 0,
+    },
+    {
+      id: "789",
+      finolierId: "abc",
+      createdAt: new Date(),
+      threadId: "thread-2",
+      message: "test message 1",
+      likes: 1,
+      dislikes: 0,
+    },
+  ];
+  it("given a list of posts, returns the threads that are not in the database", async () => {
+    // thread-2 in database already
+    vi.mocked(prisma.threads.findMany).mockResolvedValue([{ id: "thread-2" }]);
+
+    const response = await getMissingThreadIds(mockedPosts);
+
+    // call with unique thread ids
+    expect(prisma.threads.findMany).toHaveBeenCalledWith({
+      where: { id: { in: ["thread-1", "thread-2"] } },
+      select: { id: true },
+    });
+
+    //return only thread-1 because not in db
+    expect(response).toEqual(["thread-1"]);
   });
 });
