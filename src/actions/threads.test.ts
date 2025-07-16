@@ -1,10 +1,19 @@
 import { it, describe, expect, vi, beforeEach } from "vitest";
-import { storeThreads, fetchThread, type Thread } from "./threads";
+import {
+  storeThreads,
+  fetchThread,
+  fetchThreadsDB,
+  fetchLatestThreads,
+  type Thread,
+} from "./threads";
 import prisma from "@/db";
+
 vi.mock("@/db", () => ({
   default: {
     threads: {
       createMany: vi.fn(),
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
     },
   },
 }));
@@ -75,5 +84,93 @@ describe("fetchThread", () => {
       link: responseThread.link,
       createdAt: responseThread.createdAt,
     });
+  });
+});
+
+describe("fetchThreadsDB", () => {
+  it("passes the right arguments to the DB", async () => {
+    const threadIds = ["123", "456"];
+    await fetchThreadsDB(threadIds);
+
+    expect(prisma.threads.findMany).toHaveBeenCalledWith({
+      where: {
+        id: {
+          in: threadIds,
+        },
+      },
+    });
+  });
+});
+
+describe("fetchLatestThreads", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("makes a GET request to the API with the right parameters", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        response: [
+          {
+            id: "123",
+            clean_title: "test title",
+            link: "www.test.com",
+            createdAt: new Date(),
+          },
+        ],
+      }),
+    });
+
+    vi.stubGlobal("fetch", mockFetch);
+
+    await fetchLatestThreads(30, "some-forum");
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("forum=some-forum&limit=30"),
+      expect.objectContaining({
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+  });
+
+  it("returns threads that are not already in the database", async () => {
+    const responseThreads = [
+      {
+        id: "123",
+        clean_title: "test title",
+        link: "www.test.com",
+        createdAt: new Date("2025-07-16"),
+      },
+      {
+        id: "456",
+        clean_title: "test title 2",
+        link: "www.test.com",
+        createdAt: new Date("2025-07-01"),
+      },
+    ];
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        response: responseThreads,
+      }),
+    });
+
+    vi.stubGlobal("fetch", mockFetch);
+
+    // Most recent thread mock
+    vi.mocked(prisma.threads.findFirst).mockResolvedValue({
+      id: "5743",
+      clean_title: "test title",
+      link: "www.test.com",
+      createdAt: new Date("2025-07-10"),
+    });
+
+    const result = await fetchLatestThreads(30, "some-forum");
+
+    // One thread should be filtered out
+    expect(result.threads).toHaveLength(1);
+    expect(result.threads[0]).toMatchObject({ id: "123" });
   });
 });
