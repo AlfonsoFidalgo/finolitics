@@ -1,6 +1,11 @@
 import { it, describe, expect, vi, beforeEach } from "vitest";
 
-import { storeAndUpdatePosts, fetchFinolierPosts, type Post } from "./posts";
+import {
+  storeAndUpdatePosts,
+  fetchFinolierPosts,
+  getPostsToCreate,
+  type Post,
+} from "./posts";
 import prisma from "@/db";
 
 vi.mock("@/db", () => ({
@@ -8,6 +13,7 @@ vi.mock("@/db", () => ({
     posts: {
       create: vi.fn(),
       update: vi.fn(),
+      findMany: vi.fn(),
     },
     $transaction: vi.fn(),
   },
@@ -171,5 +177,51 @@ describe("fetchFinolierPosts", () => {
       likes: 1,
       dislikes: 0,
     });
+  });
+});
+
+describe("getPostsToCreate", () => {
+  const mockedPostsToCreate: Post[] = [
+    {
+      id: "123",
+      finolierId: "finolier-1",
+      createdAt: new Date(),
+      threadId: "thread-1",
+      message: "post message 1",
+      likes: 0,
+      dislikes: 1,
+    },
+    {
+      id: "234",
+      finolierId: "finolier-4",
+      createdAt: new Date("2025-07-17T09:15:00Z"),
+      threadId: "thread-1",
+      message: "new post in same thread",
+      likes: 2,
+      dislikes: 0,
+    },
+    {
+      id: "345",
+      finolierId: "finolier-5",
+      createdAt: new Date("2025-07-18T11:45:00Z"),
+      threadId: "thread-4",
+      message: "completely new post in new thread",
+      likes: 1,
+      dislikes: 3,
+    },
+  ];
+
+  it("splits the list of posts into two groups", async () => {
+    vi.mocked(prisma.posts.findMany).mockResolvedValue([{ id: "234" }]);
+
+    const { postsToCreate, postsToUpdate } = await getPostsToCreate(
+      mockedPostsToCreate
+    );
+
+    expect(postsToUpdate).toHaveLength(1);
+    expect(postsToUpdate[0]).toEqual(mockedPostsToCreate[1]);
+
+    expect(postsToCreate).toHaveLength(2);
+    expect(postsToCreate[1]).toEqual(mockedPostsToCreate[2]);
   });
 });
