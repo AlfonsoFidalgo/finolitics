@@ -4,6 +4,7 @@ import {
   storeAndUpdatePosts,
   fetchFinolierPosts,
   getPostsToCreate,
+  fetchGreatestPostsDB,
   type Post,
 } from "./posts";
 import prisma from "@/db";
@@ -223,5 +224,45 @@ describe("getPostsToCreate", () => {
 
     expect(postsToCreate).toHaveLength(2);
     expect(postsToCreate[1]).toEqual(mockedPostsToCreate[2]);
+  });
+});
+
+describe("fetchGreatestPostsDB", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+  const finolierId = "finolier1";
+  const mockedPost = {
+    id: "456",
+    finolierId: "finolier-2",
+    createdAt: new Date("2025-07-15T10:30:00Z"),
+    threadId: "thread-2",
+    message: "updated post message",
+    likes: 5,
+    dislikes: 2,
+    popularity: 7,
+  };
+  it("queries de db with the right id", async () => {
+    await fetchGreatestPostsDB(finolierId);
+
+    expect(prisma.posts.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          finolierId,
+        },
+        orderBy: {
+          popularity: "desc",
+        },
+      })
+    );
+    expect(prisma.posts.findMany).toHaveBeenCalledOnce();
+  });
+
+  it("returns a list of posts", async () => {
+    vi.mocked(prisma.posts.findMany).mockResolvedValue([mockedPost]);
+    const posts = await fetchGreatestPostsDB(finolierId);
+
+    expect(posts).toHaveLength(1);
+    expect(posts[0]).toEqual(mockedPost);
   });
 });
