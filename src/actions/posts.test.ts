@@ -1,8 +1,7 @@
 import { it, describe, expect, vi, beforeEach } from "vitest";
 
-import { storeAndUpdatePosts, type Post } from "./posts";
+import { storeAndUpdatePosts, fetchFinolierPosts, type Post } from "./posts";
 import prisma from "@/db";
-import { threadId } from "worker_threads";
 
 vi.mock("@/db", () => ({
   default: {
@@ -106,6 +105,71 @@ describe("storeAndUpdatePosts", () => {
         where: { id: post.id },
         data: { ...post, popularity: post.likes + post.dislikes },
       });
+    });
+  });
+});
+
+describe("fetchFinolierPosts", () => {
+  it("makes the API request with the right parameters", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        response: [
+          {
+            id: "123",
+            createdAt: new Date(),
+            thread: "thread test",
+            raw_message: "test raw message",
+            likes: 1,
+            dislikes: 0,
+            parent: 123,
+          },
+          {
+            id: "456",
+            createdAt: new Date("2025-07-18"),
+            thread: "thread test 2",
+            raw_message: "test raw message 2",
+            likes: 1,
+            dislikes: 0,
+            parent: null,
+          },
+        ],
+      }),
+    });
+
+    vi.stubGlobal("fetch", mockFetch);
+
+    const finolierId = "finolierId";
+    const limit = 11;
+    await fetchFinolierPosts(finolierId, limit);
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining(`user=username%3A${finolierId}`),
+      expect.objectContaining({
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining(`limit=${limit}`),
+      expect.any(Object)
+    );
+  });
+
+  it("returns filtered posts in the right format", async () => {
+    const finolierId = "finolierId";
+    const limit = 11;
+    const result = await fetchFinolierPosts(finolierId, limit);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      id: "456",
+      finolierId: "finolierId",
+      createdAt: expect.any(Date),
+      threadId: "thread test 2",
+      message: "test raw message 2",
+      likes: 1,
+      dislikes: 0,
     });
   });
 });
