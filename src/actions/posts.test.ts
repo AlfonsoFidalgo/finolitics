@@ -5,6 +5,7 @@ import {
   fetchFinolierPosts,
   getPostsToCreate,
   fetchGreatestPostsDB,
+  fetchRecentGreatestPostsDB,
   type Post,
 } from "./posts";
 import prisma from "@/db";
@@ -19,6 +20,10 @@ vi.mock("@/db", () => ({
     $transaction: vi.fn(),
   },
 }));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 describe("storeAndUpdatePosts", () => {
   const mockedPostsToUpdate: Post[] = [
@@ -228,9 +233,6 @@ describe("getPostsToCreate", () => {
 });
 
 describe("fetchGreatestPostsDB", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
   const finolierId = "finolier1";
   const mockedPost = {
     id: "456",
@@ -265,4 +267,45 @@ describe("fetchGreatestPostsDB", () => {
     expect(posts).toHaveLength(1);
     expect(posts[0]).toEqual(mockedPost);
   });
+});
+
+describe("fetchRecentGreatestPostsDB", () => {
+  const mockedPost = {
+    id: "postid",
+    finolierId: "finolier-2",
+    createdAt: new Date("2025-07-15T10:30:00Z"),
+    threadId: "thread-2",
+    message: "updated post message",
+    likes: 5,
+    dislikes: 2,
+    popularity: 7,
+  };
+  it("queries de db with the right query", async () => {
+    await fetchRecentGreatestPostsDB();
+
+    expect(prisma.posts.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          createdAt: expect.objectContaining({ gte: expect.any(Date) }),
+        },
+        orderBy: {
+          popularity: "desc",
+        },
+        take: 25,
+      })
+    );
+    expect(prisma.posts.findMany).toHaveBeenCalledOnce();
+  });
+
+  it("returns a list of posts", async () => {
+    vi.mocked(prisma.posts.findMany).mockResolvedValue([mockedPost]);
+    const posts = await fetchRecentGreatestPostsDB();
+    console.log(posts);
+    expect(posts).toHaveLength(1);
+    expect(posts[0]).toEqual(mockedPost);
+  });
+});
+
+describe("updateFinoliersPosts", () => {
+  it("passes", () => {});
 });
