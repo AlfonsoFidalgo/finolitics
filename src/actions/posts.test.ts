@@ -6,6 +6,7 @@ import {
   getPostsToCreate,
   fetchGreatestPostsDB,
   fetchRecentGreatestPostsDB,
+  updateFinoliersPosts,
   type Post,
 } from "./posts";
 import prisma from "@/db";
@@ -17,9 +18,39 @@ vi.mock("@/db", () => ({
       update: vi.fn(),
       findMany: vi.fn(),
     },
+    finoliers: {
+      findMany: vi.fn(),
+      updateMany: vi.fn(),
+    },
     $transaction: vi.fn(),
   },
 }));
+
+const mockFetch = vi.fn().mockResolvedValue({
+  ok: true,
+  json: vi.fn().mockResolvedValue({
+    response: [
+      {
+        id: "123",
+        createdAt: new Date(),
+        thread: "thread test",
+        raw_message: "test raw message",
+        likes: 1,
+        dislikes: 0,
+        parent: 123,
+      },
+      {
+        id: "456",
+        createdAt: new Date("2025-07-18"),
+        thread: "thread test 2",
+        raw_message: "test raw message 2",
+        likes: 1,
+        dislikes: 0,
+        parent: null,
+      },
+    ],
+  }),
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -123,32 +154,6 @@ describe("storeAndUpdatePosts", () => {
 
 describe("fetchFinolierPosts", () => {
   it("makes the API request with the right parameters", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue({
-        response: [
-          {
-            id: "123",
-            createdAt: new Date(),
-            thread: "thread test",
-            raw_message: "test raw message",
-            likes: 1,
-            dislikes: 0,
-            parent: 123,
-          },
-          {
-            id: "456",
-            createdAt: new Date("2025-07-18"),
-            thread: "thread test 2",
-            raw_message: "test raw message 2",
-            likes: 1,
-            dislikes: 0,
-            parent: null,
-          },
-        ],
-      }),
-    });
-
     vi.stubGlobal("fetch", mockFetch);
 
     const finolierId = "finolierId";
@@ -307,5 +312,52 @@ describe("fetchRecentGreatestPostsDB", () => {
 });
 
 describe("updateFinoliersPosts", () => {
-  it("passes", () => {});
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+  vi.stubGlobal("fetch", mockFetch);
+
+  it("doesn't update anything if last update time under 24 hours", async () => {
+    vi.mocked(prisma.finoliers.findMany).mockResolvedValue([
+      { id: "123", lastPostsUpdate: new Date(Date.now() - 5 * 60 * 60 * 1000) },
+      { id: "456", lastPostsUpdate: new Date(Date.now() - 1 * 60 * 60 * 1000) },
+    ]);
+    const result = await updateFinoliersPosts(["123", "456"]);
+
+    expect(result.success).toBe(true);
+    expect(result.message).toBe(
+      "All finolier posts already updated in the last 12 hours"
+    );
+  });
+
+  it("fetches posts from finoliers that were not updated in the last 12 hours", async () => {
+    vi.mocked(prisma.finoliers.findMany).mockResolvedValue([
+      {
+        id: "123",
+        lastPostsUpdate: new Date(Date.now() - 35 * 60 * 60 * 1000),
+      },
+      {
+        id: "789",
+        lastPostsUpdate: new Date(Date.now() - 5 * 60 * 60 * 1000),
+      },
+      { id: "456", lastPostsUpdate: null },
+    ]);
+
+    await updateFinoliersPosts(["123", "456"]);
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining(`user=username%3A123`),
+      expect.objectContaining({
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining(`user=username%3A456`),
+      expect.objectContaining({
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+  });
 });
