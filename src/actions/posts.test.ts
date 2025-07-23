@@ -9,7 +9,6 @@ import {
   updateFinoliersPosts,
   type Post,
 } from "./posts";
-import prisma from "@/db";
 
 vi.mock("@/db", () => ({
   default: {
@@ -25,6 +24,25 @@ vi.mock("@/db", () => ({
     $transaction: vi.fn(),
   },
 }));
+import prisma from "@/db";
+
+vi.mock("@/actions", async () => {
+  const actual = await vi.importActual("@/actions");
+  return {
+    ...actual,
+    fetchLatestThreads: vi.fn(),
+    fetchThread: vi.fn(),
+    getMissingThreadIds: vi.fn(),
+    storeThreads: vi.fn(),
+  };
+});
+
+import {
+  fetchLatestThreads,
+  storeThreads,
+  fetchThread,
+  getMissingThreadIds,
+} from "@/actions";
 
 const mockFetch = vi.fn().mockResolvedValue({
   ok: true,
@@ -314,6 +332,32 @@ describe("fetchRecentGreatestPostsDB", () => {
 describe("updateFinoliersPosts", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    vi.mocked(fetchLatestThreads).mockResolvedValue({
+      success: true,
+      message: "Threads fetched successfully",
+      threads: [
+        {
+          id: "thread1",
+          title: "Test Thread",
+          link: "https://example.com",
+          createdAt: new Date(),
+        },
+      ],
+    });
+
+    vi.mocked(storeThreads).mockResolvedValue({ success: true });
+    vi.mocked(getMissingThreadIds).mockResolvedValue([]);
+    vi.mocked(fetchThread).mockResolvedValue({
+      success: true,
+      message: "Thread fetched",
+      thread: {
+        id: "thread1",
+        title: "Test Thread",
+        link: "https://example.com",
+        createdAt: new Date(),
+      },
+    });
   });
   vi.stubGlobal("fetch", mockFetch);
 
@@ -330,34 +374,54 @@ describe("updateFinoliersPosts", () => {
     );
   });
 
-  it("fetches posts from finoliers that were not updated in the last 12 hours", async () => {
+  it("fetches posts and threads from finoliers that were not updated in the last 12 hours", async () => {
+    const postIds = ["123", "789", "456"];
     vi.mocked(prisma.finoliers.findMany).mockResolvedValue([
       {
-        id: "123",
+        id: postIds[0],
         lastPostsUpdate: new Date(Date.now() - 35 * 60 * 60 * 1000),
       },
       {
-        id: "789",
+        id: postIds[1],
         lastPostsUpdate: new Date(Date.now() - 5 * 60 * 60 * 1000),
       },
-      { id: "456", lastPostsUpdate: null },
+      { id: postIds[2], lastPostsUpdate: null },
     ]);
 
-    await updateFinoliersPosts(["123", "456"]);
+    const res = await updateFinoliersPosts(["123", "456"]);
 
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining(`user=username%3A123`),
+      expect.stringContaining(`user=username%3A${postIds[0]}`),
       expect.objectContaining({
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
     );
+    expect(mockFetch).not.toHaveBeenCalledWith(
+      expect.stringContaining(`user=username%3A${postIds[1]}`),
+      expect.objectContaining({
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining(`user=username%3A456`),
+      expect.stringContaining(`user=username%3A${postIds[2]}`),
       expect.objectContaining({
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
     );
+
+    expect(res.success).toBe(true);
+
+    expect(vi.mocked(storeThreads)).toHaveBeenCalledWith([
+      {
+        id: "thread1",
+        title: "Test Thread",
+        link: "https://example.com",
+        createdAt: expect.any(Date),
+      },
+    ]);
   });
 });
